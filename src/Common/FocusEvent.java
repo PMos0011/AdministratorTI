@@ -1,5 +1,7 @@
-package MainWindow;
+package Common;
 
+import MainWindow.ControllerMainWindow;
+import MainWindow.Main;
 import javafx.scene.control.TextField;
 
 import java.awt.event.FocusListener;

@@ -1,5 +1,6 @@
 package Common;
 
+import Slide.Slide;
 import javafx.scene.image.Image;
 
 import java.io.FileInputStream;
@@ -17,5 +18,13 @@ public class Loader {
         }
 
         return image;
+    }
+
+    public Slide loadInitialSlide(){
+        Slide slide = new Slide(imageLoad("src/images/dok.png"),
+                imageLoad("src/images/Cont_background.png"),
+                "0", "NAGŁÓWEK", "Opis slajdu", "opis slajdu", 0);
+
+        return slide;
     }
 }

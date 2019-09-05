@@ -1,5 +1,7 @@
-package MainWindow;
+package Common;
 
+import MainWindow.ControllerMainWindow;
+import MainWindow.Main;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;

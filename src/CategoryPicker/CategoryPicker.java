@@ -65,8 +65,10 @@ public class CategoryPicker extends Application {
 
         pickerStage.setTitle("Kategorie");
         pickerStage.setScene(new Scene(root, 375, 195));
-        pickerStage.initModality(Modality.APPLICATION_MODAL);
-        pickerStage.initStyle(StageStyle.UTILITY);
+        if (pickerStage.getModality() != Modality.APPLICATION_MODAL) {
+            pickerStage.initModality(Modality.APPLICATION_MODAL);
+            pickerStage.initStyle(StageStyle.UTILITY);
+        }
         pickerStage.show();
 
     }

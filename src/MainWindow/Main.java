@@ -25,6 +25,7 @@ import java.util.List;
 public class Main extends Application {
 
     private Loader loader = new Loader();
+    private CategoryPicker picker = new CategoryPicker(loader);
     private ControllerMainWindow controllerMainWindow;
     private Slide initSlide;
     private Slide currentSlide = new Slide();
@@ -180,7 +181,6 @@ public class Main extends Application {
     }
 
     private void showCategoryWindow(MouseEvent e){
-        CategoryPicker picker = new CategoryPicker(loader);
         picker.start(CategoryPicker.pickerStage);
     }
 }

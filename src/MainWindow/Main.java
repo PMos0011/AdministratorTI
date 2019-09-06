@@ -11,8 +11,8 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ListView;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.stage.Stage;
@@ -25,12 +25,11 @@ import java.util.List;
 public class Main extends Application {
 
     private Loader loader = new Loader();
-    private CategoryPicker picker = new CategoryPicker(loader);
+    private CategoryPicker picker = new CategoryPicker(loader, this);
     private ControllerMainWindow controllerMainWindow;
     private Slide initSlide;
     private Slide currentSlide = new Slide();
     private List<Slide> slides = new ArrayList<Slide>();
-    private FocusEvent focusEvent;
     private ListView slideList;
     private ObservableList<String> listViewSlides = FXCollections.observableArrayList();
 
@@ -61,7 +60,7 @@ public class Main extends Application {
         slideList.setCellFactory(param -> new CellsFactory(slideList, listViewSlides, controllerMainWindow, this));
         slideList.setOnMousePressed(this::listClicked);
 
-        focusEvent = new FocusEvent(controllerMainWindow, this);
+        FocusEvent.setFocusEvent(controllerMainWindow, this);
     }
 
 
@@ -86,21 +85,44 @@ public class Main extends Application {
         }
 
         for (File file : files) {
+            if (fileFilter(file)) {
+                String fileName = crateSlideName(file);
+                Slide tempSlide = setImage(file);
+                tempSlide.setCategory(loader.imageLoad("src/images/dok.png"));
+                tempSlide.setHeader(fileName);
+                slides.add(tempSlide);
 
-            String fileName = crateSlideName(file);
-            Slide tempSlide = new Slide();
-            tempSlide.setImage(loader.imageLoad(file.getAbsolutePath()));
-            tempSlide.setCategory(loader.imageLoad("C:/Users/pawel/IdeaProjects/AdministratorTI/src/images/dok.png"));
-            tempSlide.setHeader(fileName);
-            slides.add(tempSlide);
+                viewUpdate(tempSlide);
 
-            viewUpdate(tempSlide);
-
-            listViewSlides.add(tempSlide.getHeader());
-            controllerMainWindow.addSlideToList(listViewSlides, listViewSlides.size() - 1);
-            currentSlide = tempSlide;
+                listViewSlides.add(tempSlide.getHeader());
+                controllerMainWindow.addSlideToList(listViewSlides, listViewSlides.size() - 1);
+                currentSlide = tempSlide;
+            }else{
+                new Alert(Alert.AlertType.WARNING,"Nieobsługiwany plik: "+file.getName()).show();
+            }
         }
         e.consume();
+    }
+
+    private Slide setImage(File file){
+        Slide slide = new Slide();
+
+        if(file.getName().toLowerCase().endsWith(".png") ||
+                file.getName().toLowerCase().endsWith(".jpg"))
+            slide.setImage(loader.imageLoad(file));
+        else if(file.getName().toLowerCase().endsWith(".pdf"))
+            slide.setImage(loader.pdfLoad(file));
+        else if(file.getName().toLowerCase().endsWith(".tif"))
+            slide.setImage(loader.tiffLoad(file));
+        return slide;
+    }
+
+
+    private boolean fileFilter(File file) {
+        return file.getName().toLowerCase().endsWith(".png") ||
+                file.getName().toLowerCase().endsWith(".jpg") ||
+                file.getName().toLowerCase().endsWith(".pdf") ||
+                file.getName().toLowerCase().endsWith(".tif");
     }
 
     private void viewUpdate(Slide slide) {
@@ -111,7 +133,7 @@ public class Main extends Application {
         controllerMainWindow.setSecondLineText(slide.getSecondDescription());
     }
 
-    public void listClicked(MouseEvent e) {
+    private void listClicked(MouseEvent e) {
         String test = slideList.getSelectionModel().getSelectedItem().toString();
         for (Slide slide : slides) {
             if (slide.getHeader().equals(test)) {
@@ -180,8 +202,14 @@ public class Main extends Application {
         return name;
     }
 
-    private void showCategoryWindow(MouseEvent e){
+    private void showCategoryWindow(MouseEvent e) {
         picker.start(CategoryPicker.pickerStage);
+    }
+
+    public void setCategory(String categoryPath) {
+        currentSlide.setCategory(loader.imageLoad(categoryPath));
+        viewUpdate(currentSlide);
+
     }
 }
 

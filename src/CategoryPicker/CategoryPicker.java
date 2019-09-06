@@ -1,11 +1,16 @@
 package CategoryPicker;
 
 import Common.Loader;
+import MainWindow.Main;
 import javafx.application.Application;
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -19,6 +24,7 @@ public class CategoryPicker extends Application {
     public static Stage pickerStage = new Stage();
 
     private Loader loader;
+    private Main main;
 
     private ImageView[][] images = new ImageView[3][6];
     private Tooltip[][] tooltips = new Tooltip[3][6];
@@ -26,11 +32,11 @@ public class CategoryPicker extends Application {
     private List<String> categoryItems = new ArrayList<>();
     private List<String> categoryNames = new ArrayList<>();
 
-    public CategoryPicker(Loader loader) {
+    public CategoryPicker(Loader loader, Main main) {
         this.loader = loader;
+        this.main = main;
         setCategoryPaths();
         setCategoryNames();
-
     }
 
     @Override
@@ -47,15 +53,19 @@ public class CategoryPicker extends Application {
         for (int i = 0; i < 3; i++) {
             xPos = 10;
             for (int j = 0; j < 6; j++) {
+                int categoryID = i * 3 + j;
                 images[i][j] = new ImageView();
+                images[i][j].setCursor(Cursor.HAND);
                 images[i][j].setFitHeight(55);
                 images[i][j].setFitWidth(55);
                 images[i][j].setLayoutX(xPos);
                 images[i][j].setLayoutY(yPos);
-                image = loader.imageLoad(categoryItems.get(i * 3 + j));
+                images[i][j].setId(String.valueOf(categoryID));
+                image = loader.imageLoad(categoryItems.get(categoryID));
                 images[i][j].setImage(image);
-                tooltips[i][j] = new Tooltip(categoryNames.get(i * 3 + j));
+                tooltips[i][j] = new Tooltip(categoryNames.get(categoryID));
                 images[i][j].setPickOnBounds(true);
+                images[i][j].addEventHandler(MouseEvent.MOUSE_CLICKED, new sendCategoryPath());
                 Tooltip.install(images[i][j], tooltips[i][j]);
                 xPos += 60;
                 root.getChildren().add(images[i][j]);
@@ -113,5 +123,16 @@ public class CategoryPicker extends Application {
         categoryNames.add("wiadomości");
         categoryNames.add("wycieczki");
         categoryNames.add("zdrowie");
+    }
+
+    private class sendCategoryPath implements EventHandler<Event>{
+
+        @Override
+        public void handle(Event event) {
+            int categoryID = Integer.valueOf(((ImageView)event.getSource()).getId());
+            String path = categoryItems.get(categoryID);
+            main.setCategory(path);
+            pickerStage.close();
+        }
     }
 }

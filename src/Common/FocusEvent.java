@@ -7,11 +7,6 @@ import javafx.scene.control.TextField;
 import java.awt.event.FocusListener;
 
 public class FocusEvent implements FocusListener {
-    private Main main;
-
-    private TextField headerField;
-    private TextField firsField;
-    private TextField secondField;
 
     @Override
     public void focusGained(java.awt.event.FocusEvent e) {
@@ -23,13 +18,11 @@ public class FocusEvent implements FocusListener {
 
     }
 
-    public FocusEvent(ControllerMainWindow controllerMainWindow, Main main) {
+    public static void setFocusEvent(ControllerMainWindow controllerMainWindow, Main main) {
 
-        this.main = main;
-
-        headerField = controllerMainWindow.getHeaderText();
-        firsField = controllerMainWindow.getFirstLineText();
-        secondField = controllerMainWindow.getSecondLineText();
+        TextField headerField = controllerMainWindow.getHeaderText();
+        TextField firsField = controllerMainWindow.getFirstLineText();
+        TextField secondField = controllerMainWindow.getSecondLineText();
 
         headerField.focusedProperty().addListener((ov, oldV, newV) -> {
             if (!newV)

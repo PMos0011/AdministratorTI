@@ -1,3 +1,4 @@
 AdministratorTI
 
-add maven pdfbox, pdfbox-tools
+add maven apache pdfbox, pdfbox-tools </br>
+add maven twelvemonkeys imageio-tiff

@@ -6,23 +6,19 @@ public class Slide {
 
     private Image category;
     private Image image;
-    private String uID;
     private String header;
     private String firstDescription;
     private String secondDescription;
-    private int viewPosition;
 
     public Slide() {
     }
 
-    public Slide(Image category, Image image, String uID, String header, String firstDescription,String secondDescription, int viewPosition) {
+    public Slide(Image category, Image image, String header, String firstDescription,String secondDescription) {
         this.category = category;
         this.image = image;
-        this.uID = uID;
         this.header = header;
         this.firstDescription = firstDescription;
         this.secondDescription=secondDescription;
-        this.viewPosition = viewPosition;
     }
 
     public Image getCategory() {
@@ -39,14 +35,6 @@ public class Slide {
 
     public void setImage(Image image) {
         this.image = image;
-    }
-
-    public String getuID() {
-        return uID;
-    }
-
-    public void setuID(String uID) {
-        this.uID = uID;
     }
 
     public String getHeader() {
@@ -71,14 +59,6 @@ public class Slide {
 
     public void setSecondDescription(String secondDescription) {
         this.secondDescription = secondDescription;
-    }
-
-    public int getViewPosition() {
-        return viewPosition;
-    }
-
-    public void setViewPosition(int viewPosition) {
-        this.viewPosition = viewPosition;
     }
 
 }

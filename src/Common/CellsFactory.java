@@ -85,8 +85,6 @@ public class CellsFactory extends ListCell<String> {
     @Override
     protected void updateItem(String item, boolean empty) {
         super.updateItem(item, empty);
-
-
         if (empty) {
             setText(null);
             setStyle("-fx-background-color: white");

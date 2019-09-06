@@ -16,6 +16,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,7 +81,6 @@ public class CategoryPicker extends Application {
             pickerStage.initStyle(StageStyle.UTILITY);
         }
         pickerStage.show();
-
     }
 
     private void setCategoryPaths() {
@@ -129,7 +129,7 @@ public class CategoryPicker extends Application {
 
         @Override
         public void handle(Event event) {
-            int categoryID = Integer.valueOf(((ImageView)event.getSource()).getId());
+            int categoryID = Integer.parseInt(((ImageView)event.getSource()).getId());
             String path = categoryItems.get(categoryID);
             main.setCategory(path);
             pickerStage.close();

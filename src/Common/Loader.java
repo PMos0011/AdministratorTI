@@ -11,6 +11,7 @@ import org.apache.pdfbox.rendering.PDFRenderer;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,9 +28,9 @@ public class Loader {
 
         Image image = null;
         try {
-            image = new Image(new FileInputStream(path));
+            image = new Image(new FileInputStream(new File(path)));
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            Logs.saveLog(e.toString(),"Loader");
         }
 
         return image;
@@ -41,18 +42,22 @@ public class Loader {
         try {
             image = new Image(new FileInputStream(file));
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            Logs.saveLog(e.toString(),"Loader");
         }
+
+        BufferedImage frame = SwingFXUtils.fromFXImage(image,null);
+        frame=resizeImage(frame);
+        image=SwingFXUtils.toFXImage(frame,null);
+        frame.flush();
 
         return image;
     }
 
     public Slide loadInitialSlide() {
-        Slide slide = new Slide(imageLoad("src/images/dok.png"),
-                imageLoad("src/images/Cont_background.png"),
-                "0", "NAGŁÓWEK", "Opis slajdu", "opis slajdu", 0);
 
-        return slide;
+        return new Slide(imageLoad("src/images/dok.png"),
+                imageLoad(new File ("src/images/Cont_background.png")),
+                "NAGŁÓWEK", "Opis slajdu", "opis slajdu");
     }
 
     public Image pdfLoad(File file) {
@@ -67,12 +72,13 @@ public class Loader {
 
             PDFRenderer renderer = new PDFRenderer(document);
             BufferedImage pdfImage = renderer.renderImageWithDPI(pageNumber - 1, 300, ImageType.RGB);
+            pdfImage = resizeImage(pdfImage);
             image = SwingFXUtils.toFXImage(pdfImage, null);
             document.close();
             pdfImage.flush();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            Logs.saveLog(e.toString(),"Loader");
         }
 
         return image;
@@ -82,7 +88,6 @@ public class Loader {
 
         Image image = null;
         int pageNumber = 1;
-
 
         try {
             ImageInputStream inputStream = ImageIO.createImageInputStream(file);
@@ -96,15 +101,14 @@ public class Loader {
                 pageNumber = getPage(reader.getNumImages(true), file);
 
             BufferedImage tiffImage = reader.read(pageNumber - 1);
+            tiffImage = resizeImage(tiffImage);
             image = SwingFXUtils.toFXImage(tiffImage, null);
             tiffImage.flush();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            Logs.saveLog(e.toString(),"Loader");
         }
-
         return image;
-
     }
 
     private int getPage(int pages, File file) {
@@ -121,21 +125,17 @@ public class Loader {
 
         Optional<Integer> result = dialog.showAndWait();
 
-        if (result.isPresent())
-            return result.get();
-        else
-
-            return 1;
+        return result.orElse(1);
     }
 
-    public void resizeImage(Image image) {
+    private BufferedImage resizeImage(BufferedImage image) {
         double imageWidth = image.getWidth();
         double imageHeight = image.getHeight();
 
         double proportion = imageWidth / imageHeight;
 
-        double widthDifference;
-        double heightDifference;
+        double widthDifference = 0;
+        double heightDifference = 0;
 
         if (proportion < 1.41) {
             imageWidth = imageHeight * 1.415;
@@ -145,5 +145,13 @@ public class Loader {
             heightDifference = (imageHeight - image.getHeight()) / 2;
         }
 
+        BufferedImage frame = new BufferedImage((int) imageWidth, (int) imageHeight, BufferedImage.TYPE_INT_RGB);
+        Graphics2D graphics2D = frame.createGraphics();
+        graphics2D.setColor(Color.WHITE);
+        graphics2D.fillRect(0, 0, (int) imageWidth, (int) imageHeight);
+        graphics2D.drawImage(image, null, (int) widthDifference, (int) heightDifference);
+        graphics2D.dispose();
+
+        return frame;
     }
 }

@@ -4,6 +4,7 @@ import CategoryPicker.CategoryPicker;
 import Common.CellsFactory;
 import Common.FocusEvent;
 import Common.Loader;
+import Common.Logs;
 import Slide.Slide;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -21,18 +22,16 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class Main extends Application {
 
     private Loader loader = new Loader();
     private CategoryPicker picker = new CategoryPicker(loader, this);
     private ControllerMainWindow controllerMainWindow;
     private Slide initSlide;
+    private ListView slideList;
     private Slide currentSlide = new Slide();
     private List<Slide> slides = new ArrayList<Slide>();
-    private ListView slideList;
     private ObservableList<String> listViewSlides = FXCollections.observableArrayList();
-
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -63,85 +62,8 @@ public class Main extends Application {
         FocusEvent.setFocusEvent(controllerMainWindow, this);
     }
 
-
     public static void main(String[] args) {
         launch(args);
-    }
-
-    private void dragDetect(DragEvent e) {
-
-        e.acceptTransferModes(TransferMode.ANY);
-        e.consume();
-    }
-
-    private void dropDetect(DragEvent e) {
-
-        Dragboard dragboard = e.getDragboard();
-
-        List<File> files = new ArrayList<>();
-
-        if (dragboard.hasFiles()) {
-            files = dragboard.getFiles();
-        }
-
-        for (File file : files) {
-            if (fileFilter(file)) {
-                String fileName = crateSlideName(file);
-                Slide tempSlide = setImage(file);
-                tempSlide.setCategory(loader.imageLoad("src/images/dok.png"));
-                tempSlide.setHeader(fileName);
-                slides.add(tempSlide);
-
-                viewUpdate(tempSlide);
-
-                listViewSlides.add(tempSlide.getHeader());
-                controllerMainWindow.addSlideToList(listViewSlides, listViewSlides.size() - 1);
-                currentSlide = tempSlide;
-            }else{
-                new Alert(Alert.AlertType.WARNING,"Nieobsługiwany plik: "+file.getName()).show();
-            }
-        }
-        e.consume();
-    }
-
-    private Slide setImage(File file){
-        Slide slide = new Slide();
-
-        if(file.getName().toLowerCase().endsWith(".png") ||
-                file.getName().toLowerCase().endsWith(".jpg"))
-            slide.setImage(loader.imageLoad(file));
-        else if(file.getName().toLowerCase().endsWith(".pdf"))
-            slide.setImage(loader.pdfLoad(file));
-        else if(file.getName().toLowerCase().endsWith(".tif"))
-            slide.setImage(loader.tiffLoad(file));
-        return slide;
-    }
-
-
-    private boolean fileFilter(File file) {
-        return file.getName().toLowerCase().endsWith(".png") ||
-                file.getName().toLowerCase().endsWith(".jpg") ||
-                file.getName().toLowerCase().endsWith(".pdf") ||
-                file.getName().toLowerCase().endsWith(".tif");
-    }
-
-    private void viewUpdate(Slide slide) {
-        controllerMainWindow.setMainImage(slide.getImage());
-        controllerMainWindow.setCategoryImage(slide.getCategory());
-        controllerMainWindow.setHeader(slide.getHeader());
-        controllerMainWindow.setFirstLine(slide.getFirstDescription());
-        controllerMainWindow.setSecondLineText(slide.getSecondDescription());
-    }
-
-    private void listClicked(MouseEvent e) {
-        String test = slideList.getSelectionModel().getSelectedItem().toString();
-        for (Slide slide : slides) {
-            if (slide.getHeader().equals(test)) {
-                currentSlide = slide;
-                viewUpdate(currentSlide);
-                break;
-            }
-        }
     }
 
     public void updateHeader(String text) {
@@ -176,6 +98,88 @@ public class Main extends Application {
         viewUpdate(currentSlide);
     }
 
+    public void setCategory(String categoryPath) {
+        currentSlide.setCategory(loader.imageLoad(categoryPath));
+        viewUpdate(currentSlide);
+    }
+
+    private void dragDetect(DragEvent e) {
+
+        e.acceptTransferModes(TransferMode.ANY);
+        e.consume();
+    }
+
+    private void dropDetect(DragEvent e) {
+
+        Dragboard dragboard = e.getDragboard();
+
+        List<File> files = new ArrayList<>();
+
+        if (dragboard.hasFiles()) {
+            files = dragboard.getFiles();
+        }
+
+        for (File file : files) {
+            if (fileFilter(file)) {
+                String fileName = crateSlideName(file);
+                Slide tempSlide = setImage(file);
+                tempSlide.setCategory(loader.imageLoad("src/images/dok.png"));
+                tempSlide.setHeader(fileName);
+                slides.add(tempSlide);
+
+                viewUpdate(tempSlide);
+
+                listViewSlides.add(tempSlide.getHeader());
+                controllerMainWindow.addSlideToList(listViewSlides, listViewSlides.size() - 1);
+                currentSlide = tempSlide;
+            } else {
+                new Alert(Alert.AlertType.WARNING, "Nieobsługiwany plik: " + file.getName()).show();
+            }
+        }
+        e.consume();
+    }
+
+    private Slide setImage(File file) {
+        Slide slide = new Slide();
+
+        if (file.getName().toLowerCase().endsWith(".png") ||
+                file.getName().toLowerCase().endsWith(".jpeg") ||
+                file.getName().toLowerCase().endsWith(".jpg"))
+            slide.setImage(loader.imageLoad(file));
+        else if (file.getName().toLowerCase().endsWith(".pdf"))
+            slide.setImage(loader.pdfLoad(file));
+        else if (file.getName().toLowerCase().endsWith(".tif"))
+            slide.setImage(loader.tiffLoad(file));
+        return slide;
+    }
+
+    private boolean fileFilter(File file) {
+        return file.getName().toLowerCase().endsWith(".png") ||
+                file.getName().toLowerCase().endsWith(".jpeg") ||
+                file.getName().toLowerCase().endsWith(".jpg") ||
+                file.getName().toLowerCase().endsWith(".pdf") ||
+                file.getName().toLowerCase().endsWith(".tif");
+    }
+
+    private void viewUpdate(Slide slide) {
+        controllerMainWindow.setMainImage(slide.getImage());
+        controllerMainWindow.setCategoryImage(slide.getCategory());
+        controllerMainWindow.setHeader(slide.getHeader());
+        controllerMainWindow.setFirstLine(slide.getFirstDescription());
+        controllerMainWindow.setSecondLineText(slide.getSecondDescription());
+    }
+
+    private void listClicked(MouseEvent e) {
+        String test = slideList.getSelectionModel().getSelectedItem().toString();
+        for (Slide slide : slides) {
+            if (slide.getHeader().equals(test)) {
+                currentSlide = slide;
+                viewUpdate(currentSlide);
+                break;
+            }
+        }
+    }
+
     private String crateSlideName(File file) {
 
         String fileName = file.getAbsolutePath();
@@ -204,12 +208,6 @@ public class Main extends Application {
 
     private void showCategoryWindow(MouseEvent e) {
         picker.start(CategoryPicker.pickerStage);
-    }
-
-    public void setCategory(String categoryPath) {
-        currentSlide.setCategory(loader.imageLoad(categoryPath));
-        viewUpdate(currentSlide);
-
     }
 }
 

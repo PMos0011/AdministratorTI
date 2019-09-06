@@ -7,10 +7,13 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
 
 
 public class ControllerMainWindow {
 
+    @FXML
+    private BorderPane borderPane;
     @FXML
     private TextField headerText;
     @FXML
@@ -23,6 +26,10 @@ public class ControllerMainWindow {
     private ImageView categoryImage;
     @FXML
     private ListView slideList;
+
+    public BorderPane getBorderPane() {
+        return borderPane;
+    }
 
     public ImageView getMainImage() {
         return mainImage;

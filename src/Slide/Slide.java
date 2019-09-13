@@ -9,14 +9,16 @@ public class Slide {
     private String header;
     private String firstDescription;
     private String secondDescription;
+    private String categoryPath;
 
     public Slide() {
     }
 
-    public Slide(Image category, Image image, String header, String firstDescription,String secondDescription) {
+    public Slide(Image category, Image image, String categoryPath, String header, String firstDescription,String secondDescription) {
         this.category = category;
         this.image = image;
         this.header = header;
+        this.categoryPath = categoryPath;
         this.firstDescription = firstDescription;
         this.secondDescription=secondDescription;
     }
@@ -31,6 +33,14 @@ public class Slide {
 
     public Image getImage() {
         return image;
+    }
+
+    public void setCategoryPath(String categoryPath) {
+        this.categoryPath = categoryPath;
+    }
+
+    public String getCategoryPath() {
+        return categoryPath;
     }
 
     public void setImage(Image image) {

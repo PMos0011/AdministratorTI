@@ -11,5 +11,6 @@
     <orderEntry type="library" name="org.apache.pdfbox:pdfbox:2.0.16" level="project" />
     <orderEntry type="library" name="org.apache.pdfbox:pdfbox-tools:2.0.16" level="project" />
     <orderEntry type="library" name="com.twelvemonkeys.imageio:imageio-tiff:3.4.2" level="project" />
+    <orderEntry type="library" name="com.google.code.gson:gson:2.8.5" level="project" />
   </component>
 </module>

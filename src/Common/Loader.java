@@ -17,10 +17,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
 
 public class Loader {
 
@@ -30,7 +28,7 @@ public class Loader {
         try {
             image = new Image(new FileInputStream(new File(path)));
         } catch (FileNotFoundException e) {
-            Logs.saveLog(e.toString(),"Loader");
+            Logs.saveLog(e.toString(), "Loader");
         }
 
         return image;
@@ -42,12 +40,12 @@ public class Loader {
         try {
             image = new Image(new FileInputStream(file));
         } catch (FileNotFoundException e) {
-            Logs.saveLog(e.toString(),"Loader");
+            Logs.saveLog(e.toString(), "Loader");
         }
 
-        BufferedImage frame = SwingFXUtils.fromFXImage(image,null);
-        frame=resizeImage(frame);
-        image=SwingFXUtils.toFXImage(frame,null);
+        BufferedImage frame = SwingFXUtils.fromFXImage(image, null);
+        frame = resizeImage(frame);
+        image = SwingFXUtils.toFXImage(frame, null);
         frame.flush();
 
         return image;
@@ -56,7 +54,7 @@ public class Loader {
     public Slide loadInitialSlide() {
 
         return new Slide(imageLoad("src/images/dok.png"),
-                imageLoad(new File ("src/images/Cont_background.png")),
+                imageLoad(new File("src/images/Cont_background.png")), "src/images/dok.png",
                 "NAGŁÓWEK", "Opis slajdu", "opis slajdu");
     }
 
@@ -78,7 +76,7 @@ public class Loader {
             pdfImage.flush();
 
         } catch (IOException e) {
-            Logs.saveLog(e.toString(),"Loader");
+            Logs.saveLog(e.toString(), "Loader");
         }
 
         return image;
@@ -106,7 +104,7 @@ public class Loader {
             tiffImage.flush();
 
         } catch (IOException e) {
-            Logs.saveLog(e.toString(),"Loader");
+            Logs.saveLog(e.toString(), "Loader");
         }
         return image;
     }
@@ -153,5 +151,18 @@ public class Loader {
         graphics2D.dispose();
 
         return frame;
+    }
+
+    public static String nameGenerator(int charNumber) {
+        Random r = new Random();
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (int i = 0; i < charNumber; i++) {
+            int asciiNumber = r.nextInt(25) + 97;
+            char asciiChar = (char) asciiNumber;
+            stringBuilder.append(asciiChar);
+        }
+
+        return stringBuilder.toString();
     }
 }

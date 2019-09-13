@@ -3,6 +3,7 @@ package MainWindow;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -26,6 +27,8 @@ public class ControllerMainWindow {
     private ImageView categoryImage;
     @FXML
     private ListView slideList;
+    @FXML
+    private MenuItem saveMenuItem;
 
     public BorderPane getBorderPane() {
         return borderPane;
@@ -53,6 +56,10 @@ public class ControllerMainWindow {
 
     public ImageView getCategoryImage() {
         return categoryImage;
+    }
+
+    public MenuItem getSaveMenuItem() {
+        return saveMenuItem;
     }
 
     public void setMainImage(Image image) {

@@ -1,19 +1,18 @@
 package MainWindow;
 
 import CategoryPicker.CategoryPicker;
-import Common.CellsFactory;
-import Common.FocusEvent;
-import Common.Loader;
-import Common.Logs;
+import Common.*;
 import Slide.Slide;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.stage.Stage;
@@ -24,6 +23,8 @@ import java.util.List;
 
 public class Main extends Application {
 
+    private static String DEFAULT_CATEGORY_PATH = "src/images/dok.png";
+
     private Loader loader = new Loader();
     private CategoryPicker picker = new CategoryPicker(loader, this);
     private ControllerMainWindow controllerMainWindow;
@@ -33,9 +34,10 @@ public class Main extends Application {
     private List<Slide> slides = new ArrayList<Slide>();
     private ObservableList<String> listViewSlides = FXCollections.observableArrayList();
 
+    private MenuItem saveAction;
+
     @Override
     public void start(Stage primaryStage) throws Exception {
-
         initSlide = loader.loadInitialSlide();
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("MainWindow.fxml"));
@@ -58,6 +60,9 @@ public class Main extends Application {
         slideList = controllerMainWindow.getSlideList();
         slideList.setCellFactory(param -> new CellsFactory(slideList, listViewSlides, controllerMainWindow, this));
         slideList.setOnMousePressed(this::listClicked);
+
+        saveAction = controllerMainWindow.getSaveMenuItem();
+        saveAction.setOnAction(this::saveFiles);
 
         FocusEvent.setFocusEvent(controllerMainWindow, this);
     }
@@ -100,6 +105,7 @@ public class Main extends Application {
 
     public void setCategory(String categoryPath) {
         currentSlide.setCategory(loader.imageLoad(categoryPath));
+        currentSlide.setCategoryPath(categoryPath);
         viewUpdate(currentSlide);
     }
 
@@ -123,7 +129,8 @@ public class Main extends Application {
             if (fileFilter(file)) {
                 String fileName = crateSlideName(file);
                 Slide tempSlide = setImage(file);
-                tempSlide.setCategory(loader.imageLoad("src/images/dok.png"));
+                tempSlide.setCategory(loader.imageLoad(DEFAULT_CATEGORY_PATH));
+                tempSlide.setCategoryPath(DEFAULT_CATEGORY_PATH);
                 tempSlide.setHeader(fileName);
                 slides.add(tempSlide);
 
@@ -208,6 +215,21 @@ public class Main extends Application {
 
     private void showCategoryWindow(MouseEvent e) {
         picker.start(CategoryPicker.pickerStage);
+    }
+
+    private void saveFiles(ActionEvent event) {
+        FileHandler fileHandler = new FileHandler();
+        boolean saveSuccess;
+
+        for (Slide slide : slides) {
+            saveSuccess = fileHandler.saveSlide(slide);
+            if (!saveSuccess) {
+                new Alert(Alert.AlertType.ERROR, "Błąd zapisu : " + slide.getHeader()).showAndWait();
+                break;
+            }
+        }
+
+        JSONHandler.createJSONFile(fileHandler,slides);
     }
 }
 

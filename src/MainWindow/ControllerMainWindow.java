@@ -29,6 +29,8 @@ public class ControllerMainWindow {
     private ListView slideList;
     @FXML
     private MenuItem saveMenuItem;
+    @FXML
+    private MenuItem openMenuItem;
 
     public BorderPane getBorderPane() {
         return borderPane;
@@ -60,6 +62,10 @@ public class ControllerMainWindow {
 
     public MenuItem getSaveMenuItem() {
         return saveMenuItem;
+    }
+
+    public MenuItem getOpenMenuItem() {
+        return openMenuItem;
     }
 
     public void setMainImage(Image image) {

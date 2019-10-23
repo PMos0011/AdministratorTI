@@ -15,6 +15,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -25,6 +26,7 @@ public class Main extends Application {
 
     private static String DEFAULT_CATEGORY_PATH = "src/images/dok.png";
 
+    private Stage primaryStage;
     private Loader loader = new Loader();
     private CategoryPicker picker = new CategoryPicker(loader, this);
     private ControllerMainWindow controllerMainWindow;
@@ -34,12 +36,12 @@ public class Main extends Application {
     private List<Slide> slides = new ArrayList<Slide>();
     private ObservableList<String> listViewSlides = FXCollections.observableArrayList();
 
-    private MenuItem saveAction;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         initSlide = loader.loadInitialSlide();
 
+        this.primaryStage = primaryStage;
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("MainWindow.fxml"));
         Parent root = fxmlLoader.load();
         controllerMainWindow = fxmlLoader.getController();
@@ -61,8 +63,10 @@ public class Main extends Application {
         slideList.setCellFactory(param -> new CellsFactory(slideList, listViewSlides, controllerMainWindow, this));
         slideList.setOnMousePressed(this::listClicked);
 
-        saveAction = controllerMainWindow.getSaveMenuItem();
+        MenuItem saveAction = controllerMainWindow.getSaveMenuItem();
         saveAction.setOnAction(this::saveFiles);
+        MenuItem openAction = controllerMainWindow.getOpenMenuItem();
+        openAction.setOnAction(this::openFile);
 
         FocusEvent.setFocusEvent(controllerMainWindow, this);
     }
@@ -219,17 +223,48 @@ public class Main extends Application {
 
     private void saveFiles(ActionEvent event) {
         FileHandler fileHandler = new FileHandler();
-        boolean saveSuccess;
 
         for (Slide slide : slides) {
-            saveSuccess = fileHandler.saveSlide(slide);
-            if (!saveSuccess) {
+            if (!fileHandler.saveSlide(slide)) {
                 new Alert(Alert.AlertType.ERROR, "Błąd zapisu : " + slide.getHeader()).showAndWait();
                 break;
             }
         }
 
-        JSONHandler.createJSONFile(fileHandler,slides);
+        JSONHandler.createJSONFile(fileHandler, slides);
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Zapisz prezentację");
+        fileChooser.setInitialDirectory(fileHandler.getSaveDirectory());
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("archiwum zip", "*.zip"));
+        File saveFile = fileChooser.showSaveDialog(primaryStage);
+
+        if (saveFile != null) {
+            if (fileHandler.zipFiles(saveFile))
+                new Alert(Alert.AlertType.INFORMATION, "Zapisano").showAndWait();
+            else
+                new Alert(Alert.AlertType.ERROR, "Błąd zapisu").showAndWait();
+        }
+    }
+
+    private void openFile(ActionEvent event) {
+        FileHandler fileHandler = new FileHandler();
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Otwórz prezentację");
+        fileChooser.setInitialDirectory(fileHandler.getSaveDirectory());
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("archiwum zip", "*.zip"));
+        File openFile = fileChooser.showOpenDialog(primaryStage);
+
+        if (openFile != null)
+            if (fileHandler.unzipFiles(openFile)){
+                JSONHandler.readJSONFile(fileHandler);
+                }
+            else
+                new Alert(Alert.AlertType.ERROR, "Ups, coś poszło nie tak").showAndWait();
+
     }
 }
 

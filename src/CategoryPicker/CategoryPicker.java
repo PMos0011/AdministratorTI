@@ -125,11 +125,11 @@ public class CategoryPicker extends Application {
         categoryNames.add("zdrowie");
     }
 
-    private class sendCategoryPath implements EventHandler<Event>{
+    private class sendCategoryPath implements EventHandler<Event> {
 
         @Override
         public void handle(Event event) {
-            int categoryID = Integer.parseInt(((ImageView)event.getSource()).getId());
+            int categoryID = Integer.parseInt(((ImageView) event.getSource()).getId());
             String path = categoryItems.get(categoryID);
             main.setCategory(path);
             pickerStage.close();

@@ -2,6 +2,7 @@ package MainWindow;
 
 import CategoryPicker.CategoryPicker;
 import Common.*;
+import JSONObjects.JSONHandler;
 import Slide.Slide;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -87,6 +88,30 @@ public class Main extends Application {
         launch(args);
     }
 
+    private void createSlidesList(List<File> files) {
+        for (File file : files) {
+            if (fileFilter(file)) {
+                Slide tempSlide = setImage(file);
+                String header = crateSlideName(file);
+                tempSlide.setCategory(loader.imageLoad(DEFAULT_CATEGORY_PATH));
+                tempSlide.setCategoryPath(DEFAULT_CATEGORY_PATH);
+
+                tempSlide.setHeader(header);
+                tempSlide.setFileName(Slide.generateName(16));
+                slides.add(tempSlide);
+
+                viewUpdate(tempSlide);
+
+                listFileNames.add(tempSlide.getFileName());
+                slideHeaders.add(tempSlide.getHeader());
+                controllerMainWindow.addSlideToList(slideHeaders, listFileNames.size() - 1);
+                currentSlide = tempSlide;
+            } else {
+                new Alert(Alert.AlertType.WARNING, "Nieobsługiwany plik: " + file.getName()).show();
+            }
+        }
+    }
+
     private void updateHeader(KeyEvent e) {
         int slideID = slideList.getSelectionModel().getSelectedIndex();
         int caretPosition = headerField.getCaretPosition();
@@ -136,36 +161,14 @@ public class Main extends Application {
 
         Dragboard dragboard = e.getDragboard();
 
-        List<File> files = new ArrayList<>();
-
         if (dragboard.hasFiles()) {
-            files = dragboard.getFiles();
-        }
-
-        for (File file : files) {
-            if (fileFilter(file)) {
-                String header = crateSlideName(file);
-                Slide tempSlide = setImage(file);
-                tempSlide.setCategory(loader.imageLoad(DEFAULT_CATEGORY_PATH));
-                tempSlide.setCategoryPath(DEFAULT_CATEGORY_PATH);
-                tempSlide.setHeader(header);
-                tempSlide.setFileName(Slide.generateName(16));
-                slides.add(tempSlide);
-
-                viewUpdate(tempSlide);
-
-                listFileNames.add(tempSlide.getFileName());
-                slideHeaders.add(tempSlide.getHeader());
-                controllerMainWindow.addSlideToList(slideHeaders, listFileNames.size() - 1);
-                currentSlide = tempSlide;
-            } else {
-                new Alert(Alert.AlertType.WARNING, "Nieobsługiwany plik: " + file.getName()).show();
-            }
+            List<File> files = dragboard.getFiles();
+            createSlidesList(files);
         }
         e.consume();
     }
 
-    private Slide setImage(File file) {
+    public Slide setImage(File file) {
         Slide slide = new Slide();
 
         if (file.getName().toLowerCase().endsWith(".png") ||
@@ -259,11 +262,23 @@ public class Main extends Application {
 
         if (openFile != null)
             if (fileHandler.unzipFiles(openFile)) {
-                JSONHandler.readJSONFile(fileHandler);
+                slides.clear();
+                slides = JSONHandler.readJSONFile(this, fileHandler, loader);
+
+                listFileNames.clear();
+                slideHeaders.clear();
+
+                for (Slide slide : slides) {
+                    listFileNames.add(slide.getFileName());
+                    slideHeaders.add(slide.getHeader());
+                }
+
+                controllerMainWindow.addSlideToList(slideHeaders, 0);
+                currentSlide = slides.get(0);
+                viewUpdate(currentSlide);
+
             } else
                 new Alert(Alert.AlertType.ERROR, "Ups, coś poszło nie tak").showAndWait();
 
     }
 }
-
-

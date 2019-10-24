@@ -95,5 +95,4 @@ public class ControllerMainWindow {
         slideList.getItems().addAll(list);
         slideList.getSelectionModel().select(selectedItem);
     }
-
 }

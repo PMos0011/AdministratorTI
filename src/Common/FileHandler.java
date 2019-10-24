@@ -27,12 +27,12 @@ public class FileHandler {
         return new File(saveDirectory);
     }
 
-    public File getTempDirectory(){
+    public File getTempDirectory() {
         return new File(tempDirectory);
     }
 
     public boolean saveSlide(Slide slide) {
-        String fileName = tempDirectory + "/" + slide.getFileName() + ".png";
+        String fileName = tempDirectory + File.separator + slide.getFileName() + ".png";
         fileName = fileName.replaceAll("\\s+", "");
         BufferedImage image = SwingFXUtils.fromFXImage(slide.getImage(), null);
         try {

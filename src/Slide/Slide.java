@@ -83,16 +83,15 @@ public class Slide {
         this.secondDescription = secondDescription;
     }
 
-    public static String generateName(int charCount){
+    public static String generateName(int charCount) {
         Random random = new Random();
 
         StringBuilder name = new StringBuilder();
 
-        for (int i=0; i<charCount; i++){
+        for (int i = 0; i < charCount; i++) {
             char asciCode = (char) (random.nextInt(25) + 97);
             name.append(asciCode);
         }
         return name.toString();
     }
-
 }

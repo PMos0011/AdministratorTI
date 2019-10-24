@@ -1,11 +1,14 @@
-package Common;
+package JSONObjects;
 
+import Common.FileHandler;
+import Common.Loader;
+import Common.Logs;
+import MainWindow.Main;
 import Slide.Slide;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.google.gson.GsonBuilder;
 
 import java.io.*;
-import java.lang.reflect.Type;
 import java.util.*;
 
 public class JSONHandler {
@@ -13,33 +16,41 @@ public class JSONHandler {
     public static void createJSONFile(FileHandler fileHandler, List<Slide> slides, List<String> fileNames) {
 
         JSONObject JSONobject = new JSONObject();
+        int counter = 1;
 
         for (String fileName : fileNames) {
             for (Slide slide : slides) {
                 if (fileName.equals(slide.getFileName())) {
+
                     String description = "";
-                    if(slide.getFirstDescription()!=null)
-                        description+=slide.getFirstDescription();
-                    if(slide.getSecondDescription()!=null)
-                        description+=slide.getSecondDescription();
-                    JSONSlide JSONslide = new JSONSlide(slide.getFileName(), slide.getCategoryPath(),
+                    if (slide.getFirstDescription() != null)
+                        description += slide.getFirstDescription() + "<br>";
+                    else
+                        description += "<br>";
+                    if (slide.getSecondDescription() != null)
+                        description += slide.getSecondDescription() + "<br>";
+                    else
+                        description += "<br>";
+                    description += counter + "/" + slides.size();
+                    counter++;
+
+                    JSONSlide JSONslide = new JSONSlide(slide.getFileName() + ".png", slide.getCategoryPath(),
                             slide.getHeader(), description);
                     JSONobject.addJSONSlide(JSONslide);
                 }
             }
         }
 
-
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
         String JSONString = gson.toJson(JSONobject);
 
         JSONSave(fileHandler, JSONString);
 
     }
 
-    public static void readJSONFile(FileHandler fileHandler) {
+    public static List<Slide> readJSONFile(Main main, FileHandler fileHandler, Loader loader) {
 
-        FileFilter filter = pathname -> pathname.getName().endsWith("txt");
+        FileFilter filter = pathname -> pathname.getName().endsWith("json");
 
         File files = fileHandler.getTempDirectory();
         File[] jsonFile = files.listFiles(filter);
@@ -52,19 +63,23 @@ public class JSONHandler {
                 while ((tempLine = reader.readLine()) != null)
                     jsonObject.append(tempLine);
 
-                Type targetClassType = new TypeToken<ArrayList<JSONSlide>>() {
-                }.getType();
-                Collection<JSONSlide> slideList = new Gson().fromJson(String.valueOf(jsonObject), targetClassType);
+                JSONObject JSONobject;
+                Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+                JSONobject = gson.fromJson(jsonObject.toString(), JSONObject.class);
+
+                return JSONobject.getSlides(main, fileHandler, loader);
+
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+        return null;
     }
 
     private static void JSONSave(FileHandler fileHandler, String json) {
 
-        File fileName = new File(fileHandler.getTempDirectory(), "json.txt");
+        File fileName = new File(fileHandler.getTempDirectory(), "json.json");
         try {
             FileWriter writer = new FileWriter(fileName);
             writer.write(json);
@@ -73,29 +88,4 @@ public class JSONHandler {
             Logs.saveLog(e.toString(), "fileHandler");
         }
     }
-}
-
-class JSONSlide {
-    private String sa;      //file name (path)
-    private String ti;      //category name
-    private String th;      //header
-    private String tt;      //description (both lines)
-
-    public JSONSlide(String fileName, String category, String header, String description) {
-        sa = fileName;
-        ti = category;
-        th = header;
-        tt = description;
-    }
-}
-
-class JSONObject {
-
-    private Collection<JSONSlide> slides = new ArrayList<>();
-
-    public void addJSONSlide(JSONSlide slide) {
-        slides.add(slide);
-    }
-
-
 }

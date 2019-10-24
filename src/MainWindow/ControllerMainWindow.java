@@ -10,6 +10,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 
+import java.util.List;
+
 
 public class ControllerMainWindow {
 
@@ -88,7 +90,7 @@ public class ControllerMainWindow {
         secondLineText.setText(text);
     }
 
-    public void addSlideToList(ObservableList<String> list, int selectedItem) {
+    public void addSlideToList(List<String> list, int selectedItem) {
         slideList.getItems().clear();
         slideList.getItems().addAll(list);
         slideList.getSelectionModel().select(selectedItem);

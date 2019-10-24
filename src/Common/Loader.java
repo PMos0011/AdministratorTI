@@ -54,7 +54,9 @@ public class Loader {
     public Slide loadInitialSlide() {
 
         return new Slide(imageLoad("src/images/dok.png"),
-                imageLoad(new File("src/images/Cont_background.png")), "src/images/dok.png",
+                imageLoad(new File("src/images/Cont_background.png")),
+                Slide.generateName(16),
+                "src/images/dok.png",
                 "NAGŁÓWEK", "Opis slajdu", "opis slajdu");
     }
 

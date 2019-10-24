@@ -13,6 +13,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.stage.FileChooser;
@@ -32,9 +33,13 @@ public class Main extends Application {
     private ControllerMainWindow controllerMainWindow;
     private Slide initSlide;
     private ListView slideList;
+    private TextField headerField;
+    private TextField firsField;
+    private TextField secondField;
     private Slide currentSlide = new Slide();
     private List<Slide> slides = new ArrayList<Slide>();
-    private ObservableList<String> listViewSlides = FXCollections.observableArrayList();
+    private ObservableList<String> listFileNames = FXCollections.observableArrayList();
+    private List<String> slideHeaders = new ArrayList<>();
 
 
     @Override
@@ -60,40 +65,48 @@ public class Main extends Application {
         categoryImage.setOnMouseClicked(this::showCategoryWindow);
 
         slideList = controllerMainWindow.getSlideList();
-        slideList.setCellFactory(param -> new CellsFactory(slideList, listViewSlides, controllerMainWindow, this));
+        slideList.setCellFactory(param -> new CellsFactory(slideList, listFileNames, slideHeaders, controllerMainWindow, this));
         slideList.setOnMousePressed(this::listClicked);
+
+        headerField = controllerMainWindow.getHeaderText();
+        firsField = controllerMainWindow.getFirstLineText();
+        secondField = controllerMainWindow.getSecondLineText();
+
+        headerField.setOnKeyReleased(this::updateHeader);
+        firsField.setOnKeyReleased(this::updateFirsLine);
+        secondField.setOnKeyReleased(this::updateSecondLine);
 
         MenuItem saveAction = controllerMainWindow.getSaveMenuItem();
         saveAction.setOnAction(this::saveFiles);
         MenuItem openAction = controllerMainWindow.getOpenMenuItem();
         openAction.setOnAction(this::openFile);
 
-        FocusEvent.setFocusEvent(controllerMainWindow, this);
     }
 
     public static void main(String[] args) {
         launch(args);
     }
 
-    public void updateHeader(String text) {
+    private void updateHeader(KeyEvent e) {
+        int slideID = slideList.getSelectionModel().getSelectedIndex();
+        int caretPosition = headerField.getCaretPosition();
+        String slideName = headerField.getText().toUpperCase();
 
-        int slideID = listViewSlides.indexOf(currentSlide.getHeader());
-        listViewSlides.remove(slideID);
+        slideHeaders.remove(slideID);
+        currentSlide.setHeader(slideName);
+        headerField.setText(slideName);
+        headerField.positionCaret(caretPosition);
 
-        text = text.toUpperCase();
-        text = checkSlideName(text);
-        listViewSlides.add(slideID, text);
-        currentSlide.setHeader(text);
-        controllerMainWindow.addSlideToList(listViewSlides, slideID);
-        viewUpdate(currentSlide);
+        slideHeaders.add(slideID, currentSlide.getHeader());
+        controllerMainWindow.addSlideToList(slideHeaders, slideID);
     }
 
-    public void updateFirsLine(String text) {
-        currentSlide.setFirstDescription(text);
+    private void updateFirsLine(KeyEvent e) {
+        currentSlide.setFirstDescription(firsField.getText());
     }
 
-    public void updateSecondLine(String text) {
-        currentSlide.setSecondDescription(text);
+    private void updateSecondLine(KeyEvent e) {
+        currentSlide.setSecondDescription(secondField.getText());
     }
 
     public void deleteSlide() {
@@ -103,7 +116,7 @@ public class Main extends Application {
         else
             currentSlide = initSlide;
 
-        controllerMainWindow.addSlideToList(listViewSlides, 0);
+        controllerMainWindow.addSlideToList(slideHeaders, 0);
         viewUpdate(currentSlide);
     }
 
@@ -131,17 +144,19 @@ public class Main extends Application {
 
         for (File file : files) {
             if (fileFilter(file)) {
-                String fileName = crateSlideName(file);
+                String header = crateSlideName(file);
                 Slide tempSlide = setImage(file);
                 tempSlide.setCategory(loader.imageLoad(DEFAULT_CATEGORY_PATH));
                 tempSlide.setCategoryPath(DEFAULT_CATEGORY_PATH);
-                tempSlide.setHeader(fileName);
+                tempSlide.setHeader(header);
+                tempSlide.setFileName(Slide.generateName(16));
                 slides.add(tempSlide);
 
                 viewUpdate(tempSlide);
 
-                listViewSlides.add(tempSlide.getHeader());
-                controllerMainWindow.addSlideToList(listViewSlides, listViewSlides.size() - 1);
+                listFileNames.add(tempSlide.getFileName());
+                slideHeaders.add(tempSlide.getHeader());
+                controllerMainWindow.addSlideToList(slideHeaders, listFileNames.size() - 1);
                 currentSlide = tempSlide;
             } else {
                 new Alert(Alert.AlertType.WARNING, "Nieobsługiwany plik: " + file.getName()).show();
@@ -181,9 +196,10 @@ public class Main extends Application {
     }
 
     private void listClicked(MouseEvent e) {
-        String test = slideList.getSelectionModel().getSelectedItem().toString();
+        int slideID = slideList.getSelectionModel().getSelectedIndex();
+        String test2 = listFileNames.get(slideID);
         for (Slide slide : slides) {
-            if (slide.getHeader().equals(test)) {
+            if (slide.getFileName().equals(test2)) {
                 currentSlide = slide;
                 viewUpdate(currentSlide);
                 break;
@@ -197,24 +213,7 @@ public class Main extends Application {
         fileName = fileName.substring(fileName.lastIndexOf("\\") + 1);
         fileName = fileName.substring(0, fileName.lastIndexOf("."));
         fileName = fileName.toUpperCase();
-        fileName = checkSlideName(fileName);
         return fileName;
-    }
-
-    private String checkSlideName(String name) {
-        int index = 1;
-
-        for (int i = 0; i < slides.size(); i++) {
-            if (slides.get(i).getHeader().equals(name)) {
-                if (index != 1)
-                    name = name.substring(0, name.length() - 3);
-
-                name += "(" + index + ")";
-                index++;
-                i = 0;
-            }
-        }
-        return name;
     }
 
     private void showCategoryWindow(MouseEvent e) {
@@ -231,7 +230,7 @@ public class Main extends Application {
             }
         }
 
-        JSONHandler.createJSONFile(fileHandler, slides);
+        JSONHandler.createJSONFile(fileHandler, slides, listFileNames);
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Zapisz prezentację");
@@ -259,10 +258,9 @@ public class Main extends Application {
         File openFile = fileChooser.showOpenDialog(primaryStage);
 
         if (openFile != null)
-            if (fileHandler.unzipFiles(openFile)){
+            if (fileHandler.unzipFiles(openFile)) {
                 JSONHandler.readJSONFile(fileHandler);
-                }
-            else
+            } else
                 new Alert(Alert.AlertType.ERROR, "Ups, coś poszło nie tak").showAndWait();
 
     }

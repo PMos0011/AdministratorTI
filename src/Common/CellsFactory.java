@@ -11,9 +11,11 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
+import java.util.List;
+
 public class CellsFactory extends ListCell<String> {
 
-    public CellsFactory(ListView slideList, ObservableList<String> listViewSlides, ControllerMainWindow controllerMainWindow, Main main) {
+    public CellsFactory(ListView slideList, ObservableList<String> listFileNames, List<String> slideHeaders, ControllerMainWindow controllerMainWindow, Main main) {
         ListCell thisCell = this;
 
         setOnDragDetected(event -> {
@@ -30,6 +32,7 @@ public class CellsFactory extends ListCell<String> {
             content.putString(getItem());
             dragboard.setDragView(text.snapshot(null, null));
             dragboard.setContent(content);
+
 
             event.consume();
         });
@@ -57,26 +60,33 @@ public class CellsFactory extends ListCell<String> {
         setOnDragDropped(event -> {
             Dragboard db = event.getDragboard();
 
-            int draggedIdx = listViewSlides.indexOf(db.getString());
-            int thisIdx = listViewSlides.indexOf(getItem());
-            String name = listViewSlides.get(draggedIdx);
-            listViewSlides.remove(draggedIdx);
+            int thisIdx = slideHeaders.indexOf(getItem());
+            int draggedIdx = slideList.getSelectionModel().getSelectedIndex();
 
-            if (getItem() == null)
-                listViewSlides.add(name);
-            else if (db.hasString())
-                listViewSlides.add(thisIdx, name);
+            String fileName = listFileNames.get(draggedIdx);
+            String name = slideHeaders.get(draggedIdx);
+            listFileNames.remove(draggedIdx);
+            slideHeaders.remove(draggedIdx);
 
-            controllerMainWindow.addSlideToList(listViewSlides,thisIdx);
+            if (getItem() == null) {
+                listFileNames.add(fileName);
+                slideHeaders.add(name);
+            } else if (db.hasString()) {
+                listFileNames.add(thisIdx, fileName);
+                slideHeaders.add(thisIdx, name);
+            }
+
+            controllerMainWindow.addSlideToList(slideHeaders, thisIdx);
             event.setDropCompleted(true);
 
             event.consume();
         });
 
         setOnDragDone(event -> {
-            Dragboard db = event.getDragboard();
             if (event.getTransferMode() != TransferMode.MOVE) {
-                listViewSlides.remove(db.getString());
+                int draggedIdx = slideList.getSelectionModel().getSelectedIndex();
+                listFileNames.remove(draggedIdx);
+                slideHeaders.remove(draggedIdx);
                 main.deleteSlide();
             }
         });

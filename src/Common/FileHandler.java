@@ -32,7 +32,7 @@ public class FileHandler {
     }
 
     public boolean saveSlide(Slide slide) {
-        String fileName = tempDirectory + "/" + slide.getHeader() + ".png";
+        String fileName = tempDirectory + "/" + slide.getFileName() + ".png";
         fileName = fileName.replaceAll("\\s+", "");
         BufferedImage image = SwingFXUtils.fromFXImage(slide.getImage(), null);
         try {

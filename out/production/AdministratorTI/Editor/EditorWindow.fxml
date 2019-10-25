@@ -37,17 +37,20 @@
       </VBox>
    </top>
    <left>
-      <ImageView fx:id="editedImage" fitHeight="500.0" fitWidth="705.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
+      <ImageView fx:id="editedImage" fitHeight="500.0" fitWidth="705.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
+         <BorderPane.margin>
+            <Insets left="10.0" />
+         </BorderPane.margin></ImageView>
    </left>
    <right>
-      <VBox alignment="TOP_CENTER" prefWidth="180.0" BorderPane.alignment="CENTER">
+      <VBox alignment="TOP_CENTER" prefWidth="170.0" BorderPane.alignment="CENTER">
          <children>
             <Label maxWidth="1.7976931348623157E308" text="Kolor zaznaczenia">
                <VBox.margin>
                   <Insets top="10.0" />
                </VBox.margin>
             </Label>
-            <ColorPicker maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+            <ColorPicker fx:id="colorPicker" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                <VBox.margin>
                   <Insets top="10.0" />
                </VBox.margin>
@@ -57,12 +60,12 @@
                   <Insets top="40.0" />
                </VBox.margin>
             </Label>
-            <Slider blockIncrement="0.05" majorTickUnit="1.0" max="1.0" minorTickCount="0" showTickLabels="true" value="0.5">
+            <Slider fx:id="opacitySlider" blockIncrement="0.05" majorTickUnit="1.0" max="1.0" minorTickCount="0" showTickLabels="true" value="0.5">
                <VBox.margin>
                   <Insets top="10.0" />
                </VBox.margin>
             </Slider>
-            <Label text="0.5" textAlignment="CENTER">
+            <Label fx:id="opacityValue" text="0.5" textAlignment="CENTER">
                <VBox.margin>
                   <Insets />
                </VBox.margin>
@@ -83,6 +86,9 @@
                </VBox.margin>
             </Button>
          </children>
+         <BorderPane.margin>
+            <Insets right="10.0" />
+         </BorderPane.margin>
       </VBox>
    </right>
 </BorderPane>

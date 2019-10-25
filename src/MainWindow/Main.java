@@ -295,7 +295,7 @@ public class Main extends Application {
     }
 
     private void editSlides(ActionEvent event) {
-        Editor editor = new Editor();
+        Editor editor = new Editor(currentSlide.getImage());
         try {
             editor.start(Editor.editorStage);
         } catch (Exception e) {

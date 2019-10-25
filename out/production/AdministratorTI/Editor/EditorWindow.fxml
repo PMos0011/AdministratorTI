@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Editor.ControllerEditorWindow">
+   <top>
+      <VBox BorderPane.alignment="CENTER">
+         <children>
+            <MenuBar>
+              <menus>
+                <Menu mnemonicParsing="false" text="Plik">
+                  <items>
+                    <MenuItem mnemonicParsing="false" text="Zamknij" />
+                  </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Edycja">
+                  <items>
+                    <MenuItem mnemonicParsing="false" text="Zapisz" />
+                  </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Pomoc">
+                  <items>
+                    <MenuItem mnemonicParsing="false" text="O aplikacji" />
+                  </items>
+                </Menu>
+              </menus>
+            </MenuBar>
+         </children>
+      </VBox>
+   </top>
+   <left>
+      <ImageView fx:id="editedImage" fitHeight="500.0" fitWidth="705.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
+   </left>
+   <right>
+      <VBox alignment="TOP_CENTER" prefWidth="180.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label maxWidth="1.7976931348623157E308" text="Kolor zaznaczenia">
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+            </Label>
+            <ColorPicker maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+            </ColorPicker>
+            <Label maxWidth="1.7976931348623157E308" text="Przezroczystość">
+               <VBox.margin>
+                  <Insets top="40.0" />
+               </VBox.margin>
+            </Label>
+            <Slider blockIncrement="0.05" majorTickUnit="1.0" max="1.0" minorTickCount="0" showTickLabels="true" value="0.5">
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+            </Slider>
+            <Label text="0.5" textAlignment="CENTER">
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </Label>
+            <Label maxWidth="1.7976931348623157E308" text="Opcje">
+               <VBox.margin>
+                  <Insets top="40.0" />
+               </VBox.margin>
+            </Label>
+            <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Zaznacz">
+               <VBox.margin>
+                  <Insets top="5.0" />
+               </VBox.margin>
+            </Button>
+            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Zapisz">
+               <VBox.margin>
+                  <Insets top="5.0" />
+               </VBox.margin>
+            </Button>
+         </children>
+      </VBox>
+   </right>
+</BorderPane>

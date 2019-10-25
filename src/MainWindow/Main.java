@@ -2,6 +2,7 @@ package MainWindow;
 
 import CategoryPicker.CategoryPicker;
 import Common.*;
+import Editor.Editor;
 import JSONObjects.JSONHandler;
 import Slide.Slide;
 import javafx.application.Application;
@@ -81,7 +82,10 @@ public class Main extends Application {
         saveAction.setOnAction(this::saveFiles);
         MenuItem openAction = controllerMainWindow.getOpenMenuItem();
         openAction.setOnAction(this::openFile);
-
+        MenuItem clearAction = controllerMainWindow.getClearMenuItem();
+        clearAction.setOnAction(this::deleteSlides);
+        MenuItem editAction = controllerMainWindow.getEditMenuItem();
+        editAction.setOnAction(this::editSlides);
     }
 
     public static void main(String[] args) {
@@ -280,5 +284,22 @@ public class Main extends Application {
             } else
                 new Alert(Alert.AlertType.ERROR, "Ups, coś poszło nie tak").showAndWait();
 
+    }
+
+    private void deleteSlides(ActionEvent event) {
+        slides.clear();
+        listFileNames.clear();
+        slideHeaders.clear();
+        controllerMainWindow.addSlideToList(slideHeaders, 0);
+        viewUpdate(initSlide);
+    }
+
+    private void editSlides(ActionEvent event) {
+        Editor editor = new Editor();
+        try {
+            editor.start(Editor.editorStage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

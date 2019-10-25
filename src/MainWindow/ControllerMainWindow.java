@@ -33,6 +33,10 @@ public class ControllerMainWindow {
     private MenuItem saveMenuItem;
     @FXML
     private MenuItem openMenuItem;
+    @FXML
+    private MenuItem clearMenuItem;
+    @FXML
+    private MenuItem editMenuItem;
 
     public BorderPane getBorderPane() {
         return borderPane;
@@ -68,6 +72,14 @@ public class ControllerMainWindow {
 
     public MenuItem getOpenMenuItem() {
         return openMenuItem;
+    }
+
+    public MenuItem getClearMenuItem() {
+        return clearMenuItem;
+    }
+
+    public MenuItem getEditMenuItem() {
+        return editMenuItem;
     }
 
     public void setMainImage(Image image) {

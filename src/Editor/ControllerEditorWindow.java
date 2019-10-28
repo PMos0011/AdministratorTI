@@ -1,10 +1,12 @@
 package Editor;
 
 import javafx.fxml.FXML;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 
 public class ControllerEditorWindow {
 
@@ -20,6 +22,12 @@ public class ControllerEditorWindow {
     @FXML
     private Label opacityValue;
 
+    @FXML
+    private StackPane imagePane;
+
+    @FXML
+    private Canvas canvas;
+
     public ImageView getEditedImage() {
         return editedImage;
     }
@@ -34,5 +42,13 @@ public class ControllerEditorWindow {
 
     public Label getOpacityValue() {
         return opacityValue;
+    }
+
+    public StackPane getImagePane() {
+        return imagePane;
+    }
+
+    public Canvas getCanvas() {
+        return canvas;
     }
 }

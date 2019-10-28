@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.canvas.*?>
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.effect.*?>
 <?import javafx.geometry.*?>
@@ -36,12 +37,6 @@
          </children>
       </VBox>
    </top>
-   <left>
-      <ImageView fx:id="editedImage" fitHeight="500.0" fitWidth="705.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
-         <BorderPane.margin>
-            <Insets left="10.0" />
-         </BorderPane.margin></ImageView>
-   </left>
    <right>
       <VBox alignment="TOP_CENTER" prefWidth="170.0" BorderPane.alignment="CENTER">
          <children>
@@ -91,4 +86,15 @@
          </BorderPane.margin>
       </VBox>
    </right>
+   <left>
+      <StackPane fx:id="imagePane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="502.0" prefWidth="707.0" BorderPane.alignment="CENTER">
+         <children>
+            <ImageView fx:id="editedImage" fitHeight="500.0" fitWidth="705.0" pickOnBounds="true" preserveRatio="true" />
+            <Canvas fx:id="canvas" height="500.0" width="705.0" />
+         </children>
+         <BorderPane.margin>
+            <Insets left="5.0" />
+         </BorderPane.margin>
+      </StackPane>
+   </left>
 </BorderPane>

@@ -2,6 +2,7 @@ package Editor;
 
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -28,6 +29,9 @@ public class ControllerEditorWindow {
     @FXML
     private Canvas canvas;
 
+    @FXML
+    private Button clearSelection;
+
     public ImageView getEditedImage() {
         return editedImage;
     }
@@ -50,5 +54,9 @@ public class ControllerEditorWindow {
 
     public Canvas getCanvas() {
         return canvas;
+    }
+
+    public Button getClearSelection() {
+        return clearSelection;
     }
 }

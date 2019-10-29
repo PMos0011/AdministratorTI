@@ -24,6 +24,8 @@
                 </Menu>
                 <Menu mnemonicParsing="false" text="Edycja">
                   <items>
+                        <MenuItem mnemonicParsing="false" text="Zaznacz" />
+                        <MenuItem mnemonicParsing="false" text="Zaznacz proporcjonalnie" />
                     <MenuItem mnemonicParsing="false" text="Zapisz" />
                   </items>
                 </Menu>
@@ -75,7 +77,12 @@
                   <Insets top="5.0" />
                </VBox.margin>
             </Button>
-            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Zapisz">
+            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Zaznacz prop">
+               <VBox.margin>
+                  <Insets top="5.0" />
+               </VBox.margin>
+            </Button>
+            <Button fx:id="clearSelection" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Usuń zaznaczenie">
                <VBox.margin>
                   <Insets top="5.0" />
                </VBox.margin>

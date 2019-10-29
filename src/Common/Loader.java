@@ -128,7 +128,7 @@ public class Loader {
         return result.orElse(1);
     }
 
-    private BufferedImage resizeImage(BufferedImage image) {
+    public BufferedImage resizeImage(BufferedImage image) {
         double imageWidth = image.getWidth();
         double imageHeight = image.getHeight();
 
@@ -153,18 +153,5 @@ public class Loader {
         graphics2D.dispose();
 
         return frame;
-    }
-
-    public static String nameGenerator(int charNumber) {
-        Random r = new Random();
-        StringBuilder stringBuilder = new StringBuilder();
-
-        for (int i = 0; i < charNumber; i++) {
-            int asciiNumber = r.nextInt(25) + 97;
-            char asciiChar = (char) asciiNumber;
-            stringBuilder.append(asciiChar);
-        }
-
-        return stringBuilder.toString();
     }
 }

@@ -28,6 +28,10 @@ public class ControllerEditorWindow {
 
     @FXML
     private Canvas canvas;
+    @FXML
+    private Button cropImage;
+    @FXML
+    private Button cropAspectImage;
 
     @FXML
     private Button clearSelection;
@@ -54,6 +58,14 @@ public class ControllerEditorWindow {
 
     public Canvas getCanvas() {
         return canvas;
+    }
+
+    public Button getCropImage() {
+        return cropImage;
+    }
+
+    public Button getCropAspectImage() {
+        return cropAspectImage;
     }
 
     public Button getClearSelection() {

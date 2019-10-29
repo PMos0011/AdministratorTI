@@ -1,11 +1,15 @@
 package Editor;
 
+import Common.Loader;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
@@ -14,6 +18,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
@@ -21,32 +26,39 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 
 public class Editor extends Application {
 
     public static Stage editorStage = new Stage();
 
-    private final int X_DIM = 705;
-    private final int Y_DIM = 500;
+    private final int X_MAX_DIMMENSION = 705;
+    private final int Y_MAX_DIMMENSION = 500;
 
     private ControllerEditorWindow controllerEditorWindow;
 
-    Image imageToEdit;
+    private ImageView editedImage;
+    private Canvas canvas;
+    private ColorPicker colorPicker;
+    private Slider opacitySlider;
+    private Label opacityLabel;
+    private Button cropImageButton;
+    private Button aspectCropImageButton;
+    private Button clearSelectionButton;
+    private Image imageToEdit;
 
-    ImageView editedImage;
-    Canvas canvas;
-    ColorPicker colorPicker;
-    Slider opacitySlider;
-    Label opacityLabel;
-    Button clearSelectionButton;
+    private int xDifference;
+    private int yDifference;
+    private Point clickedPosition;
+    private Point aspectSize;
+    private Point rectSize;
+    private Point rectTopLeft;
+    private Point imageTopLeft;
+    private Point imageSize;
+    private boolean isRectangle;
 
-    Point clickedPosition;
-    Point aspectSize;
-    Point rectSize;
-    Point rectTopLeft;
-    boolean isRectangle;
-    GraphicsContext gc;
+    private GraphicsContext gc;
 
     public Editor(Image imageToEdit) {
         this.imageToEdit = imageToEdit;
@@ -73,9 +85,9 @@ public class Editor extends Application {
         editedImage = controllerEditorWindow.getEditedImage();
         editedImage.setImage(imageToEdit);
         canvas = controllerEditorWindow.getCanvas();
-        canvas.setOnMousePressed(this::drawElement);
-        canvas.setOnMouseDragged(this::resizeElement);
-        canvas.setOnMouseReleased(this::releseMouseButton);
+        canvas.setOnMousePressed(this::canvasMousePressed);
+        canvas.setOnMouseDragged(this::canvasMouseMove);
+        canvas.setOnMouseReleased(this::releaseMouseButton);
 
         colorPicker = controllerEditorWindow.getColorPicker();
         colorPicker.setOnAction(this::colorPick);
@@ -85,12 +97,22 @@ public class Editor extends Application {
         opacityLabel = controllerEditorWindow.getOpacityValue();
         opacityLabel.textProperty().bind(Bindings.format("%.2f", opacitySlider.valueProperty()));
 
+        cropImageButton = controllerEditorWindow.getCropImage();
+        cropImageButton.setOnAction(e -> {
+            cropImage( false);
+        });
+        aspectCropImageButton = controllerEditorWindow.getCropAspectImage();
+        aspectCropImageButton.setOnAction(e -> {
+            cropImage( true);
+        });
         clearSelectionButton = controllerEditorWindow.getClearSelection();
         clearSelectionButton.setOnAction(this::clearSelection);
 
         aspectSize = new Point(1, 1);
         rectSize = new Point(1, 1);
         clickedPosition = new Point();
+        imageTopLeft = new Point();
+        imageSize = new Point();
         isRectangle = false;
 
         editorStage.show();
@@ -102,154 +124,153 @@ public class Editor extends Application {
 
     private void colorPick(ActionEvent e) {
         System.out.println(colorPicker.getValue());
-
     }
 
-    private void drawElement(MouseEvent e) {
+    private void canvasMousePressed(MouseEvent e) {
+
+        clickedPosition.x = (int) e.getX();
+        clickedPosition.y = (int) e.getY();
 
         if (e.isPrimaryButtonDown()) {
             if (gc == null)
                 gc = canvas.getGraphicsContext2D();
 
-            clickedPosition.x = (int) e.getX();
-            clickedPosition.y = (int) e.getY();
-
             if (!isRectangle)
                 rectTopLeft = (Point) clickedPosition.clone();
-
-
         }
         drawRects();
     }
 
-    private void drawRects() {
+    private void canvasMouseMove(MouseEvent e) {
+        if (e.isPrimaryButtonDown()) {
+            if (!isRectangle)
+                drawRect(e);
+            else
+                moveRect(e);
+        } else if (e.isSecondaryButtonDown())
+            if (isRectangle)
+                drawRect(e);
 
-        int x, y, a, b;
+        calculateAspectRect();
+        drawRects();
+    }
+
+    private void recapClickedPosition(MouseEvent e) {
+        xDifference = (int) e.getX();
+        yDifference = (int) e.getY();
+
+        xDifference -= clickedPosition.x;
+        yDifference -= clickedPosition.y;
+
+        clickedPosition.x = (int) e.getX();
+        clickedPosition.y = (int) e.getY();
+    }
+
+    private void drawRect(MouseEvent e) {
+        recapClickedPosition(e);
+
+        if (rectTopLeft.x + rectSize.x < X_MAX_DIMMENSION && rectTopLeft.x + rectSize.x > 0)
+            rectSize.x += xDifference;
+        if (rectTopLeft.y + rectSize.y < Y_MAX_DIMMENSION && rectTopLeft.y + rectSize.y > 0)
+            rectSize.y += yDifference;
+
+        if (rectSize.x == 0)
+            rectSize.x = 1;
+        if (rectSize.y == 0)
+            rectSize.y = 1;
+    }
+
+    private void moveRect(MouseEvent e) {
+        recapClickedPosition(e);
 
         if (rectSize.x < 0) {
-            x = rectTopLeft.x + rectSize.x;
-            a = Math.abs(rectSize.x);
-        } else {
-            x = rectTopLeft.x;
-            a = rectSize.x;
+            if (rectTopLeft.x + rectSize.x > 0)
+                rectTopLeft.x += xDifference;
+            else
+                rectTopLeft.x = Math.max(rectTopLeft.x + xDifference, rectTopLeft.x);
+        }
+        if (rectSize.y < 0) {
+            if (rectTopLeft.y + rectSize.y > 0)
+                rectTopLeft.y += yDifference;
+            else
+                rectTopLeft.y = Math.max(rectTopLeft.y + yDifference, rectTopLeft.y);
+        }
+        if (rectSize.x > 0) {
+            if (rectTopLeft.x >= 0 && rectTopLeft.x + rectSize.x < X_MAX_DIMMENSION)
+                rectTopLeft.x += xDifference;
+            else
+                rectTopLeft.x = Math.min(rectTopLeft.x + xDifference, rectTopLeft.x);
+        }
+        if (rectSize.y > 0) {
+            if (rectTopLeft.y >= 0 && rectTopLeft.y + rectSize.y < Y_MAX_DIMMENSION)
+                rectTopLeft.y += yDifference;
+            else
+                rectTopLeft.y = Math.min(rectTopLeft.y + xDifference, rectTopLeft.y);
         }
 
-        if (rectSize.y < 0) {
-            y = rectTopLeft.y + rectSize.y;
-            b = Math.abs(rectSize.y);
-        } else {
-            y = rectTopLeft.y;
-            b = rectSize.y;
+        if (rectTopLeft.x < 0)
+            rectTopLeft.x = 0;
+        if (rectTopLeft.y < 0)
+            rectTopLeft.y = 0;
+
+        if (rectTopLeft.x > X_MAX_DIMMENSION)
+            rectTopLeft.x = X_MAX_DIMMENSION;
+
+        if (rectTopLeft.y > Y_MAX_DIMMENSION)
+            rectTopLeft.y = Y_MAX_DIMMENSION;
+
+        if (rectTopLeft.x + rectSize.x > X_MAX_DIMMENSION)
+            rectSize.x = X_MAX_DIMMENSION - rectTopLeft.x;
+
+        if (rectTopLeft.y + rectSize.y > Y_MAX_DIMMENSION)
+            rectSize.y = Y_MAX_DIMMENSION - rectTopLeft.y;
+    }
+
+    private void calculateAspectRect() {
+
+        aspectSize.x = Math.abs(rectSize.x);
+        aspectSize.y = Math.abs(rectSize.y);
+
+        int aspect = aspectSize.x / aspectSize.y;
+
+        if (aspect < 1.415)
+            aspectSize.x = (int) (aspectSize.y * 1.415);
+        else
+            aspectSize.y = (int) (aspectSize.x / 1.415);
+
+        imageTopLeft = (Point) rectTopLeft.clone();
+
+        if (rectSize.x < 0)
+            imageTopLeft.x = rectTopLeft.x + rectSize.x;
+        if (rectSize.y < 0)
+            imageTopLeft.y = rectTopLeft.y + rectSize.y;
+
+        if (imageTopLeft.x + aspectSize.x > X_MAX_DIMMENSION) {
+            aspectSize.x = X_MAX_DIMMENSION - imageTopLeft.x;
+            aspectSize.y = (int) (aspectSize.x / 1.415);
+        }
+        if (imageTopLeft.y + aspectSize.y > Y_MAX_DIMMENSION) {
+            aspectSize.y = Y_MAX_DIMMENSION - imageTopLeft.y;
+            aspectSize.x = (int) (aspectSize.y * 1.415);
+        }
+    }
+
+    private void drawRects() {
+
+        if (imageTopLeft.equals(rectTopLeft))
+            imageSize = (Point) rectSize.clone();
+        else {
+            imageSize.x = Math.abs(rectSize.x);
+            imageSize.y = Math.abs(rectSize.y);
         }
 
         gc.clearRect(0, 0, 705, 500);
         gc.setFill(colorPicker.getValue());
         gc.setStroke(colorPicker.getValue());
         gc.setGlobalAlpha(opacitySlider.getValue());
-        gc.fillRoundRect(x, y, a, b, 2, 2);
+        gc.fillRoundRect(imageTopLeft.x, imageTopLeft.y, imageSize.x, imageSize.y, 2, 2);
         gc.setGlobalAlpha(1);
-        // gc.strokeRoundRect(rectTopLeft.x, rectTopLeft.y, aspectSize.x, aspectSize.y, 2, 2);
-    }
-
-    private void resizeElement(MouseEvent e) {
-        int xDifference = (int) e.getX();
-        int yDifference = (int) e.getY();
-
-        if (e.isPrimaryButtonDown()) {
-
-            xDifference -= clickedPosition.x;
-            yDifference -= clickedPosition.y;
-
-            clickedPosition.x = (int) e.getX();
-            clickedPosition.y = (int) e.getY();
-
-            if (!isRectangle) {
-                if (rectTopLeft.x + rectSize.x < X_DIM && rectTopLeft.x + rectSize.x > 0)
-                    rectSize.x += xDifference;
-                if (rectTopLeft.y + rectSize.y < Y_DIM && rectTopLeft.y + rectSize.y > 0)
-                    rectSize.y += yDifference;
-            } else {
-                if (rectTopLeft.x >= 0 && rectTopLeft.x + rectSize.x <= X_DIM)
-                    rectTopLeft.x += xDifference;
-                if (rectTopLeft.y >= 0 && rectTopLeft.y + rectSize.y <= Y_DIM)
-                    rectTopLeft.y += yDifference;
-            }
-
-            if(rectTopLeft.x<0)
-                rectTopLeft.x=0;
-            if(rectTopLeft.y<0)
-                rectTopLeft.y=0;
-
-            if(rectTopLeft.x>X_DIM)
-                rectTopLeft.x=X_DIM;
-
-            if(rectTopLeft.y>Y_DIM)
-                rectTopLeft.y=Y_DIM;
-
-
-
-
-
-
-
-
-
-
-//            int startX;
-//            int startY;
-//            int width;
-//            int height;
-//
-//
-//            if (xDifference > 0) {
-//                startX = clickedPosition.x;
-//                width = xDifference;
-//            } else {
-//                if (clickedPosition.x + xDifference < 0)
-//                    xDifference = -clickedPosition.x + 1;
-//                startX = clickedPosition.x + xDifference;
-//                width = Math.abs(xDifference);
-//            }
-//
-//            if (yDifference > 0) {
-//                startY = clickedPosition.y;
-//                height = yDifference;
-//            } else {
-//                if (clickedPosition.y + yDifference < 0)
-//                    yDifference = -clickedPosition.y;
-//                startY = clickedPosition.y + yDifference;
-//                height = Math.abs(yDifference);
-//            }
-//
-//
-//            if (width + startX > 705)
-//                width = 705;
-//            if (height + startY > 500)
-//                height = 500;
-//
-//            if (width <= 0)
-//                width = 1;
-//
-//            if (height <= 0)
-//                height = 1;
-//
-//
-//            double aspect = width / height;
-//            int aspectWidth = width;
-//            int aspectHeight = height;
-//
-//            if (aspect < 1.415)
-//                aspectWidth = (int) (height * 1.415);
-//            else
-//                aspectHeight = (int) (width / 1.415);
-//
-//            if (aspectWidth + startX <= 705 && aspectHeight + startY < 500) {
-//                aspectSize.x = aspectWidth;
-//                aspectSize.y = aspectHeight;
-//            }
-
-            drawRects();
-        }
+        gc.strokeRoundRect(imageTopLeft.x, imageTopLeft.y, aspectSize.x, aspectSize.y, 2, 2);
     }
 
     private void clearSelection(ActionEvent e) {
@@ -259,12 +280,33 @@ public class Editor extends Application {
         gc.clearRect(0, 0, 705, 500);
     }
 
-    private void releseMouseButton(MouseEvent e) {
+    private void releaseMouseButton(MouseEvent e) {
 
         if (!isRectangle) {
             isRectangle = true;
         }
-
     }
 
+    private void cropImage(boolean isScaled) {
+        Loader loader = new Loader();
+
+        SnapshotParameters parameters = new SnapshotParameters();
+        Rectangle2D rect;
+
+        if (isScaled)
+            rect = new Rectangle2D(imageTopLeft.x, imageTopLeft.y, aspectSize.x, aspectSize.y);
+        else
+            rect = new Rectangle2D(imageTopLeft.x, imageTopLeft.y, imageSize.x, imageSize.y);
+
+        parameters.setFill(Color.WHITE);
+        parameters.setViewport(rect);
+
+        WritableImage image = new WritableImage((int) rect.getWidth(), (int) rect.getHeight());
+        editedImage.snapshot(parameters, image);
+        BufferedImage bufferedImage = SwingFXUtils.fromFXImage(image,null);
+        image=SwingFXUtils.toFXImage(loader.resizeImage(bufferedImage),null);
+        editedImage.setImage(image);
+
+        clearSelection(null);
+    }
 }

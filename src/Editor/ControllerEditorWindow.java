@@ -7,34 +7,45 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 
 public class ControllerEditorWindow {
 
     @FXML
+    private BorderPane editorWindow;
+    @FXML
     private ImageView editedImage;
-
     @FXML
     private ColorPicker colorPicker;
-
+    @FXML
+    private ColorPicker alphaColorPicker;
     @FXML
     private Slider opacitySlider;
-
+    @FXML
+    private Slider alphaToleranceSlider;
     @FXML
     private Label opacityValue;
-
+    @FXML
+    private Label alphaToleranceValue;
     @FXML
     private StackPane imagePane;
-
     @FXML
     private Canvas canvas;
     @FXML
     private Button cropImage;
     @FXML
     private Button cropAspectImage;
-
     @FXML
     private Button clearSelection;
+    @FXML
+    private Button saveImage;
+    @FXML
+    private Button alphaCutButton;
+
+    public BorderPane getEditorWindow() {
+        return editorWindow;
+    }
 
     public ImageView getEditedImage() {
         return editedImage;
@@ -42,6 +53,10 @@ public class ControllerEditorWindow {
 
     public ColorPicker getColorPicker() {
         return colorPicker;
+    }
+
+    public ColorPicker getAlphaColorPicker() {
+        return alphaColorPicker;
     }
 
     public Slider getOpacitySlider() {
@@ -70,5 +85,21 @@ public class ControllerEditorWindow {
 
     public Button getClearSelection() {
         return clearSelection;
+    }
+
+    public Button getSaveImage() {
+        return saveImage;
+    }
+
+    public Button getAlphaCutButton() {
+        return alphaCutButton;
+    }
+
+    public Slider getAlphaToleranceSlider() {
+        return alphaToleranceSlider;
+    }
+
+    public Label getAlphaToleranceValue() {
+        return alphaToleranceValue;
     }
 }

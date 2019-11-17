@@ -16,6 +16,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.stage.FileChooser;
@@ -295,11 +296,16 @@ public class Main extends Application {
     }
 
     private void editSlides(ActionEvent event) {
-        Editor editor = new Editor(currentSlide.getImage());
+        Editor editor = new Editor(currentSlide.getImage(),this);
         try {
             editor.start(Editor.editorStage);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void currentSlideImageUpdate(Image image){
+        currentSlide.setImage(image);
+        viewUpdate(currentSlide);
     }
 }

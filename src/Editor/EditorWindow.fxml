@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
@@ -14,7 +20,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Editor.ControllerEditorWindow">
+<BorderPane fx:id="editorWindow" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1085.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Editor.ControllerEditorWindow">
    <top>
       <VBox BorderPane.alignment="CENTER">
          <children>
@@ -42,60 +48,6 @@
          </children>
       </VBox>
    </top>
-   <right>
-      <VBox alignment="TOP_CENTER" prefWidth="170.0" BorderPane.alignment="CENTER">
-         <children>
-            <Label maxWidth="1.7976931348623157E308" text="Kolor zaznaczenia">
-               <VBox.margin>
-                  <Insets top="10.0" />
-               </VBox.margin>
-            </Label>
-            <ColorPicker fx:id="colorPicker" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
-               <VBox.margin>
-                  <Insets top="10.0" />
-               </VBox.margin>
-            </ColorPicker>
-            <Label maxWidth="1.7976931348623157E308" text="Przezroczystość">
-               <VBox.margin>
-                  <Insets top="40.0" />
-               </VBox.margin>
-            </Label>
-            <Slider fx:id="opacitySlider" blockIncrement="0.05" majorTickUnit="1.0" max="1.0" minorTickCount="0" showTickLabels="true" value="0.5">
-               <VBox.margin>
-                  <Insets top="10.0" />
-               </VBox.margin>
-            </Slider>
-            <Label fx:id="opacityValue" text="0.5" textAlignment="CENTER">
-               <VBox.margin>
-                  <Insets />
-               </VBox.margin>
-            </Label>
-            <Label maxWidth="1.7976931348623157E308" text="Opcje">
-               <VBox.margin>
-                  <Insets top="40.0" />
-               </VBox.margin>
-            </Label>
-            <Button fx:id="cropImage" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Zaznacz">
-               <VBox.margin>
-                  <Insets top="5.0" />
-               </VBox.margin>
-            </Button>
-            <Button fx:id="cropAspectImage" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Zaznacz prop">
-               <VBox.margin>
-                  <Insets top="5.0" />
-               </VBox.margin>
-            </Button>
-            <Button fx:id="clearSelection" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Usuń zaznaczenie">
-               <VBox.margin>
-                  <Insets top="5.0" />
-               </VBox.margin>
-            </Button>
-         </children>
-         <BorderPane.margin>
-            <Insets right="10.0" />
-         </BorderPane.margin>
-      </VBox>
-   </right>
    <left>
       <StackPane fx:id="imagePane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="502.0" prefWidth="707.0" BorderPane.alignment="CENTER">
          <children>
@@ -107,4 +59,103 @@
          </BorderPane.margin>
       </StackPane>
    </left>
+   <right>
+      <HBox BorderPane.alignment="CENTER">
+         <children>
+            <VBox alignment="TOP_CENTER" prefWidth="170.0">
+               <children>
+                  <Label maxWidth="1.7976931348623157E308" text="Kolor zaznaczenia">
+                     <VBox.margin>
+                        <Insets top="10.0" />
+                     </VBox.margin>
+                  </Label>
+                  <ColorPicker fx:id="colorPicker" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                     <VBox.margin>
+                        <Insets top="10.0" />
+                     </VBox.margin>
+                  </ColorPicker>
+                  <Label maxWidth="1.7976931348623157E308" text="Przezroczystość">
+                     <VBox.margin>
+                        <Insets top="40.0" />
+                     </VBox.margin>
+                  </Label>
+                  <Slider fx:id="opacitySlider" blockIncrement="0.05" majorTickUnit="1.0" max="1.0" minorTickCount="0" showTickLabels="true" value="0.5">
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </Slider>
+                  <Label fx:id="opacityValue" text="0.50" textAlignment="CENTER">
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                  </Label>
+                  <Label maxWidth="1.7976931348623157E308" text="Opcje">
+                     <VBox.margin>
+                        <Insets top="20.0" />
+                     </VBox.margin>
+                  </Label>
+                  <Button fx:id="cropImage" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Zaznacz">
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </Button>
+                  <Button fx:id="cropAspectImage" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Zaznacz prop">
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </Button>
+                  <Button fx:id="clearSelection" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Usuń zaznaczenie">
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </Button>
+               </children>
+               <HBox.margin>
+                  <Insets right="10.0" />
+               </HBox.margin>
+            </VBox>
+            <VBox alignment="TOP_CENTER" prefWidth="170.0">
+               <children>
+                  <Label maxWidth="1.7976931348623157E308" text="Kolor alpha">
+                     <VBox.margin>
+                        <Insets top="10.0" />
+                     </VBox.margin>
+                  </Label>
+                  <ColorPicker fx:id="alphaColorPicker" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                     <VBox.margin>
+                        <Insets top="10.0" />
+                     </VBox.margin>
+                  </ColorPicker>
+                  <Label maxWidth="1.7976931348623157E308" text="Tolerancja koloru">
+                     <VBox.margin>
+                        <Insets top="40.0" />
+                     </VBox.margin>
+                  </Label>
+                  <Slider fx:id="alphaToleranceSlider" blockIncrement="0.05" majorTickUnit="0.5" max="0.5" minorTickCount="0" showTickLabels="true" value="0.1">
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </Slider>
+                  <Label fx:id="alphaToleranceValue" text="0.10" textAlignment="CENTER" />
+                  <Button fx:id="alphaCutButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Wytnij kolor alpha">
+                     <VBox.margin>
+                        <Insets top="45.0" />
+                     </VBox.margin>
+                  </Button>
+                  <Button fx:id="saveImage" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Zapisz zmiany">
+                     <VBox.margin>
+                        <Insets top="220.0" />
+                     </VBox.margin>
+                  </Button>
+               </children>
+               <HBox.margin>
+                  <Insets right="5.0" />
+               </HBox.margin>
+            </VBox>
+         </children>
+         <BorderPane.margin>
+            <Insets />
+         </BorderPane.margin>
+      </HBox>
+   </right>
 </BorderPane>

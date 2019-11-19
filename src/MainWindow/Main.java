@@ -5,6 +5,7 @@ import Common.*;
 import Editor.Editor;
 import JSONObjects.JSONHandler;
 import Slide.Slide;
+import TransferWindow.Transfer;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -87,6 +88,10 @@ public class Main extends Application {
         clearAction.setOnAction(this::deleteSlides);
         MenuItem editAction = controllerMainWindow.getEditMenuItem();
         editAction.setOnAction(this::editSlides);
+        MenuItem importActionMenuItem = controllerMainWindow.getImportMenuItem();
+        importActionMenuItem.setOnAction(this::onImportAction);
+        MenuItem exportActionMenuItem = controllerMainWindow.getExportMenuItem();
+        exportActionMenuItem.setOnAction(this::onExportAction);
     }
 
     public static void main(String[] args) {
@@ -238,7 +243,7 @@ public class Main extends Application {
             }
         }
 
-        JSONHandler.createJSONFile(fileHandler, slides, listFileNames);
+        JSONHandler.createJSONFile(fileHandler, slides, listFileNames,"save");
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Zapisz prezentację");
@@ -307,5 +312,23 @@ public class Main extends Application {
     public void currentSlideImageUpdate(Image image){
         currentSlide.setImage(image);
         viewUpdate(currentSlide);
+    }
+
+    private void onImportAction(ActionEvent event){
+        Transfer transferWindow = new Transfer(true);
+        try {
+            transferWindow.start(Transfer.transferStage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void onExportAction(ActionEvent event) {
+        Transfer transferWindow = new Transfer(false);
+        try {
+            transferWindow.start(Transfer.transferStage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

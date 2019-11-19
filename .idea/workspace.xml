@@ -58,8 +58,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Class" />
         <option value="FxmlFile" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -92,7 +92,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="dynamic.classpath" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/images" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="project.structure.last.edited" value="Libraries" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.39425287" />
@@ -104,11 +104,11 @@
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="Common" />
     </key>
-    <key name="CreateClassDialog.RecentsKey">
-      <recent name="Common" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\pawel\IdeaProjects\AdministratorTI\src\images" />
+    </key>
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="Common" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -212,15 +212,6 @@
   </component>
   <component name="TimeTrackingManager">
     <option name="totallyTimeSpent" value="1302000" />
-  </component>
-  <component name="TodoView">
-    <todo-panel id="selected-file">
-      <is-autoscroll-to-source value="true" />
-    </todo-panel>
-    <todo-panel id="all">
-      <are-packages-shown value="true" />
-      <is-autoscroll-to-source value="true" />
-    </todo-panel>
   </component>
   <component name="VcsManagerConfiguration">
     <option name="OFFER_MOVE_TO_ANOTHER_CHANGELIST_ON_PARTIAL_COMMIT" value="true" />

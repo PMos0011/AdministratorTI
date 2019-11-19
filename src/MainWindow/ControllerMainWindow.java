@@ -37,6 +37,10 @@ public class ControllerMainWindow {
     private MenuItem clearMenuItem;
     @FXML
     private MenuItem editMenuItem;
+    @FXML
+    private MenuItem importMenuItem;
+    @FXML
+    private MenuItem exportMenuItem;
 
     public BorderPane getBorderPane() {
         return borderPane;
@@ -102,9 +106,19 @@ public class ControllerMainWindow {
         secondLineText.setText(text);
     }
 
+    public MenuItem getImportMenuItem() {
+        return importMenuItem;
+    }
+
+    public MenuItem getExportMenuItem() {
+        return exportMenuItem;
+    }
+
     public void addSlideToList(List<String> list, int selectedItem) {
         slideList.getItems().clear();
         slideList.getItems().addAll(list);
         slideList.getSelectionModel().select(selectedItem);
     }
+
+
 }

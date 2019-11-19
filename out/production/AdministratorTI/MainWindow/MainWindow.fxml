@@ -26,8 +26,8 @@
                             <items>
                                 <MenuItem fx:id="openMenuItem" mnemonicParsing="false" text="Otwórz"/>
                                 <MenuItem fx:id="saveMenuItem" mnemonicParsing="false" text="Zapisz"/>
-                                <MenuItem mnemonicParsing="false" text="Publikuj"/>
-                                <MenuItem mnemonicParsing="false" text="Importuj"/>
+                                <MenuItem fx:id="exportMenuItem" mnemonicParsing="false" text="Publikuj"/>
+                                <MenuItem fx:id="importMenuItem" mnemonicParsing="false" text="Importuj"/>
                                 <MenuItem mnemonicParsing="false" text="Zamknij"/>
                             </items>
                         </Menu>

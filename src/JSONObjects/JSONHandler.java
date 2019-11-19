@@ -13,7 +13,7 @@ import java.util.*;
 
 public class JSONHandler {
 
-    public static void createJSONFile(FileHandler fileHandler, List<Slide> slides, List<String> fileNames) {
+    public static void createJSONFile(FileHandler fileHandler, List<Slide> slides, List<String> fileNames, String name) {
 
         JSONObject JSONobject = new JSONObject();
         int counter = 1;
@@ -44,7 +44,7 @@ public class JSONHandler {
         Gson gson = new GsonBuilder().disableHtmlEscaping().create();
         String JSONString = gson.toJson(JSONobject);
 
-        JSONSave(fileHandler, JSONString);
+        JSONSave(fileHandler, JSONString, name);
 
     }
 
@@ -69,7 +69,6 @@ public class JSONHandler {
 
                 return JSONobject.getSlides(main, fileHandler, loader);
 
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -77,9 +76,9 @@ public class JSONHandler {
         return null;
     }
 
-    private static void JSONSave(FileHandler fileHandler, String json) {
+    private static void JSONSave(FileHandler fileHandler, String json, String name) {
 
-        File fileName = new File(fileHandler.getTempDirectory(), "json.json");
+        File fileName = new File(fileHandler.getTempDirectory(), name+".json");
         try {
             FileWriter writer = new FileWriter(fileName);
             writer.write(json);

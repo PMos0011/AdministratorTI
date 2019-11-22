@@ -21,12 +21,15 @@ public class JSONObject {
         List<Slide> slidesList = new ArrayList<Slide>();
 
         for (JSONSlide slide : slides) {
-            File file = new File(fileHandler.getTempDirectory(), slide.getFileName());
+            String fileName = slide.getFileName().substring(
+                    slide.getFileName().lastIndexOf("/")+1);
+
+            File file = new File(fileHandler.getFileTempDirectory(), fileName);
             Slide tempSlide = main.setImage(file);
             tempSlide.setHeader(slide.getHeader());
-            tempSlide.setCategoryPath(slide.getCategory());
-            tempSlide.setCategory(loader.imageLoad(slide.getCategory()));
-            tempSlide.setFileName(slide.getFileName());
+            tempSlide.setCategoryPath(Main.CATEGORY_PATH + slide.getCategory() + ".png");
+            tempSlide.setCategory(loader.imageLoad(Main.CATEGORY_PATH + slide.getCategory() + ".png"));
+            tempSlide.setFileName(fileName.substring(0,fileName.indexOf(".")));
 
             String[] description = slide.getDescription().split("<br>");
             tempSlide.setFirstDescription(description[0]);

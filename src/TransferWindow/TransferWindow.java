@@ -1,5 +1,6 @@
 package TransferWindow;
 
+import MainWindow.Main;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
@@ -25,9 +26,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class Transfer extends Application {
+public class TransferWindow extends Application {
 
     public static Stage transferStage = new Stage();
+    private Main main;
 
     private ListView listView = new ListView();
     private Button button = new Button();
@@ -36,8 +38,9 @@ public class Transfer extends Application {
     private List<Save> saves = new ArrayList<>();
     private boolean importAction;
 
-    public Transfer(boolean importAction) {
+    public TransferWindow(boolean importAction, Main main) {
         this.importAction = importAction;
+        this.main = main;
     }
 
     @Override
@@ -148,8 +151,12 @@ public class Transfer extends Application {
                 button.setOnAction(this::buttonOnImportAction);
                 String response = getUrlResponse(groups.get(selectedItem).getParam());
                 savesListWrite(response);
-            }else
-                button.setOnAction(this::buttonOnExportAction);
+            } else {
+                FileTransfer fileTransfer = new FileTransfer(false, groups.get(selectedItem).getParam(), main);
+                fileTransfer.start(FileTransfer.fileTransferStage);
+                transferStage.close();
+            }
+
         } else
             new Alert(Alert.AlertType.INFORMATION, "Wybierz grupę").showAndWait();
     }
@@ -157,17 +164,13 @@ public class Transfer extends Application {
     private void buttonOnImportAction(ActionEvent e) {
         int selectedItem = listView.getSelectionModel().getSelectedIndex();
         if (selectedItem >= 0) {
-            //import action
             transferStage.close();
+            FileTransfer fileTransfer = new FileTransfer(true, saves.get(selectedItem).getName(), main);
+            fileTransfer.start(FileTransfer.fileTransferStage);
         } else
             new Alert(Alert.AlertType.INFORMATION, "Wybierz zapis").showAndWait();
     }
 
-    private void buttonOnExportAction(ActionEvent e){
-        //export action
-
-        transferStage.close();
-    }
 }
 
 class Group {

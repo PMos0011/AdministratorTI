@@ -5,7 +5,7 @@ import Common.*;
 import Editor.Editor;
 import JSONObjects.JSONHandler;
 import Slide.Slide;
-import TransferWindow.Transfer;
+import TransferWindow.TransferWindow;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -29,10 +29,12 @@ import java.util.List;
 
 public class Main extends Application {
 
-    private static String DEFAULT_CATEGORY_PATH = "src/images/dok.png";
+    public static final String CATEGORY_PATH = "src/images/";
+    private static final String DEFAULT_CATEGORY_ICON = CATEGORY_PATH + "dok.png";
 
     private Stage primaryStage;
     private Loader loader = new Loader();
+    private FileHandler fileHandler = new FileHandler();
     private CategoryPicker picker = new CategoryPicker(loader, this);
     private ControllerMainWindow controllerMainWindow;
     private Slide initSlide;
@@ -103,8 +105,8 @@ public class Main extends Application {
             if (fileFilter(file)) {
                 Slide tempSlide = setImage(file);
                 String header = crateSlideName(file);
-                tempSlide.setCategory(loader.imageLoad(DEFAULT_CATEGORY_PATH));
-                tempSlide.setCategoryPath(DEFAULT_CATEGORY_PATH);
+                tempSlide.setCategory(loader.imageLoad(DEFAULT_CATEGORY_ICON));
+                tempSlide.setCategoryPath(DEFAULT_CATEGORY_ICON);
 
                 tempSlide.setHeader(header);
                 tempSlide.setFileName(Slide.generateName(16));
@@ -189,6 +191,7 @@ public class Main extends Application {
             slide.setImage(loader.pdfLoad(file));
         else if (file.getName().toLowerCase().endsWith(".tif"))
             slide.setImage(loader.tiffLoad(file));
+
         return slide;
     }
 
@@ -234,7 +237,25 @@ public class Main extends Application {
     }
 
     private void saveFiles(ActionEvent event) {
-        FileHandler fileHandler = new FileHandler();
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Zapisz prezentację");
+        fileChooser.setInitialDirectory(fileHandler.getFileSaveDirectory());
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("archiwum zip", "*.zip"));
+        File saveFile = fileChooser.showSaveDialog(primaryStage);
+
+        boolean success = false;
+        if (saveFile != null)
+            success = zipFileFromTempToDirectory(saveFile, "save", 0);
+
+        if (success)
+            new Alert(Alert.AlertType.INFORMATION, "Zapisano").showAndWait();
+        else
+            new Alert(Alert.AlertType.ERROR, "Błąd zapisu").showAndWait();
+    }
+
+    public boolean zipFileFromTempToDirectory(File fileName, String JSOName, int groupID) {
 
         for (Slide slide : slides) {
             if (!fileHandler.saveSlide(slide)) {
@@ -243,53 +264,44 @@ public class Main extends Application {
             }
         }
 
-        JSONHandler.createJSONFile(fileHandler, slides, listFileNames,"save");
+        JSONHandler.createJSONFile(fileHandler, slides, listFileNames, JSOName, groupID);
 
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Zapisz prezentację");
-        fileChooser.setInitialDirectory(fileHandler.getSaveDirectory());
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("archiwum zip", "*.zip"));
-        File saveFile = fileChooser.showSaveDialog(primaryStage);
-
-        if (saveFile != null) {
-            if (fileHandler.zipFiles(saveFile))
-                new Alert(Alert.AlertType.INFORMATION, "Zapisano").showAndWait();
-            else
-                new Alert(Alert.AlertType.ERROR, "Błąd zapisu").showAndWait();
-        }
+        return (fileHandler.zipFiles(fileName));
     }
 
+
     private void openFile(ActionEvent event) {
-        FileHandler fileHandler = new FileHandler();
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Otwórz prezentację");
-        fileChooser.setInitialDirectory(fileHandler.getSaveDirectory());
+        fileChooser.setInitialDirectory(fileHandler.getFileSaveDirectory());
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("archiwum zip", "*.zip"));
         File openFile = fileChooser.showOpenDialog(primaryStage);
 
         if (openFile != null)
-            if (fileHandler.unzipFiles(openFile)) {
-                slides.clear();
-                slides = JSONHandler.readJSONFile(this, fileHandler, loader);
+            getPresentationFromFile(openFile);
+    }
 
-                listFileNames.clear();
-                slideHeaders.clear();
+    public void getPresentationFromFile(File file) {
+        if (fileHandler.unzipFiles(file)) {
+            slides.clear();
+            slides = JSONHandler.readJSONFile(this, fileHandler, loader);
 
-                for (Slide slide : slides) {
-                    listFileNames.add(slide.getFileName());
-                    slideHeaders.add(slide.getHeader());
-                }
+            listFileNames.clear();
+            slideHeaders.clear();
 
-                controllerMainWindow.addSlideToList(slideHeaders, 0);
-                currentSlide = slides.get(0);
-                viewUpdate(currentSlide);
+            for (Slide slide : slides) {
+                listFileNames.add(slide.getFileName());
+                slideHeaders.add(slide.getHeader());
+            }
 
-            } else
-                new Alert(Alert.AlertType.ERROR, "Ups, coś poszło nie tak").showAndWait();
+            controllerMainWindow.addSlideToList(slideHeaders, 0);
+            currentSlide = slides.get(0);
+            viewUpdate(currentSlide);
 
+        } else
+            new Alert(Alert.AlertType.ERROR, "Ups, coś poszło nie tak").showAndWait();
     }
 
     private void deleteSlides(ActionEvent event) {
@@ -301,7 +313,7 @@ public class Main extends Application {
     }
 
     private void editSlides(ActionEvent event) {
-        Editor editor = new Editor(currentSlide.getImage(),this);
+        Editor editor = new Editor(currentSlide.getImage(), this);
         try {
             editor.start(Editor.editorStage);
         } catch (Exception e) {
@@ -309,24 +321,24 @@ public class Main extends Application {
         }
     }
 
-    public void currentSlideImageUpdate(Image image){
+    public void currentSlideImageUpdate(Image image) {
         currentSlide.setImage(image);
         viewUpdate(currentSlide);
     }
 
-    private void onImportAction(ActionEvent event){
-        Transfer transferWindow = new Transfer(true);
+    private void onImportAction(ActionEvent event) {
+        TransferWindow transferWindow = new TransferWindow(true, this);
         try {
-            transferWindow.start(Transfer.transferStage);
+            transferWindow.start(TransferWindow.transferStage);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     private void onExportAction(ActionEvent event) {
-        Transfer transferWindow = new Transfer(false);
+        TransferWindow transferWindow = new TransferWindow(false, this);
         try {
-            transferWindow.start(Transfer.transferStage);
+            transferWindow.start(TransferWindow.transferStage);
         } catch (Exception e) {
             e.printStackTrace();
         }

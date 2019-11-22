@@ -13,7 +13,7 @@ import java.util.*;
 
 public class JSONHandler {
 
-    public static void createJSONFile(FileHandler fileHandler, List<Slide> slides, List<String> fileNames, String name) {
+    public static void createJSONFile(FileHandler fileHandler, List<Slide> slides, List<String> fileNames, String name, int groupID) {
 
         JSONObject JSONobject = new JSONObject();
         int counter = 1;
@@ -34,8 +34,13 @@ public class JSONHandler {
                     description += counter + "/" + slides.size();
                     counter++;
 
-                    JSONSlide JSONslide = new JSONSlide(slide.getFileName() + ".png", slide.getCategoryPath(),
-                            slide.getHeader(), description);
+                    String categoryName = slide.getCategoryPath().substring(
+                            slide.getCategoryPath().lastIndexOf("/")+1,
+                            slide.getCategoryPath().indexOf(".")
+                    );
+
+                    JSONSlide JSONslide = new JSONSlide(slide.getFileName() + ".png", categoryName,
+                            slide.getHeader(), description, groupID);
                     JSONobject.addJSONSlide(JSONslide);
                 }
             }
@@ -52,7 +57,7 @@ public class JSONHandler {
 
         FileFilter filter = pathname -> pathname.getName().endsWith("json");
 
-        File files = fileHandler.getTempDirectory();
+        File files = fileHandler.getFileTempDirectory();
         File[] jsonFile = files.listFiles(filter);
 
         if (jsonFile.length == 1) {
@@ -66,7 +71,7 @@ public class JSONHandler {
                 JSONObject JSONobject;
                 Gson gson = new GsonBuilder().disableHtmlEscaping().create();
                 JSONobject = gson.fromJson(jsonObject.toString(), JSONObject.class);
-
+                reader.close();
                 return JSONobject.getSlides(main, fileHandler, loader);
 
             } catch (IOException e) {
@@ -78,7 +83,8 @@ public class JSONHandler {
 
     private static void JSONSave(FileHandler fileHandler, String json, String name) {
 
-        File fileName = new File(fileHandler.getTempDirectory(), name+".json");
+        System.out.println(name);
+        File fileName = new File(fileHandler.getFileTempDirectory(), name + ".json");
         try {
             FileWriter writer = new FileWriter(fileName);
             writer.write(json);

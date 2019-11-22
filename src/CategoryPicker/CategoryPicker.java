@@ -62,7 +62,7 @@ public class CategoryPicker extends Application {
                 images[i][j].setLayoutX(xPos);
                 images[i][j].setLayoutY(yPos);
                 images[i][j].setId(String.valueOf(categoryID));
-                image = loader.imageLoad(categoryItems.get(categoryID));
+                image = loader.imageLoad(Main.CATEGORY_PATH + categoryItems.get(categoryID));
                 images[i][j].setImage(image);
                 tooltips[i][j] = new Tooltip(categoryNames.get(categoryID));
                 images[i][j].setPickOnBounds(true);
@@ -84,24 +84,24 @@ public class CategoryPicker extends Application {
     }
 
     private void setCategoryPaths() {
-        categoryItems.add("src/images/bwazne.png");
-        categoryItems.add("src/images/wazne.png");
-        categoryItems.add("src/images/dok.png");
-        categoryItems.add("src/images/foto.png");
-        categoryItems.add("src/images/kultura.png");
-        categoryItems.add("src/images/personalne.png");
-        categoryItems.add("src/images/plan.png");
-        categoryItems.add("src/images/pogoda.png");
-        categoryItems.add("src/images/praca.png");
-        categoryItems.add("src/images/prawo.png");
-        categoryItems.add("src/images/sport.png");
-        categoryItems.add("src/images/szkolenia.png");
-        categoryItems.add("src/images/swieta.png");
-        categoryItems.add("src/images/swietapan.png");
-        categoryItems.add("src/images/wczasy.png");
-        categoryItems.add("src/images/wiadomosci.png");
-        categoryItems.add("src/images/wycieczki.png");
-        categoryItems.add("src/images/zdrowie.png");
+        categoryItems.add("bwazne.png");
+        categoryItems.add("wazne.png");
+        categoryItems.add("dok.png");
+        categoryItems.add("foto.png");
+        categoryItems.add("kultura.png");
+        categoryItems.add("personalne.png");
+        categoryItems.add("plan.png");
+        categoryItems.add("pogoda.png");
+        categoryItems.add("praca.png");
+        categoryItems.add("prawo.png");
+        categoryItems.add("sport.png");
+        categoryItems.add("szkolenia.png");
+        categoryItems.add("swieta.png");
+        categoryItems.add("swietapan.png");
+        categoryItems.add("wczasy.png");
+        categoryItems.add("wiadomosci.png");
+        categoryItems.add("wycieczki.png");
+        categoryItems.add("zdrowie.png");
     }
 
     private void setCategoryNames() {
@@ -130,7 +130,7 @@ public class CategoryPicker extends Application {
         @Override
         public void handle(Event event) {
             int categoryID = Integer.parseInt(((ImageView) event.getSource()).getId());
-            String path = categoryItems.get(categoryID);
+            String path = Main.CATEGORY_PATH + categoryItems.get(categoryID);
             main.setCategory(path);
             pickerStage.close();
         }

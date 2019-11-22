@@ -6,8 +6,8 @@ public class JSONSlide {
     private String th;      //header
     private String tt;      //description (both lines)
 
-    public JSONSlide(String fileName, String category, String header, String description) {
-        sa = fileName;
+    public JSONSlide(String fileName, String category, String header, String description, int groupID) {
+        sa = "SLIDES/" + groupID + "/" +fileName;
         ti = category;
         th = header;
         tt = description;

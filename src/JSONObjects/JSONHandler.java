@@ -83,7 +83,6 @@ public class JSONHandler {
 
     private static void JSONSave(FileHandler fileHandler, String json, String name) {
 
-        System.out.println(name);
         File fileName = new File(fileHandler.getFileTempDirectory(), name + ".json");
         try {
             FileWriter writer = new FileWriter(fileName);

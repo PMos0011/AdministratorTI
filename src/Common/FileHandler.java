@@ -73,7 +73,6 @@ public class FileHandler {
             ZipOutputStream zipOut = new ZipOutputStream(zipFile);
 
             for (File file : files) {
-                System.out.println(file.getName());
                 FileInputStream inputFile = new FileInputStream(file);
                 ZipEntry zipEntry = new ZipEntry(file.getName());
                 zipOut.putNextEntry(zipEntry);

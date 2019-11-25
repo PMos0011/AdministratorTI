@@ -2,10 +2,7 @@ package Editor;
 
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Button;
-import javafx.scene.control.ColorPicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
@@ -42,6 +39,12 @@ public class ControllerEditorWindow {
     private Button saveImage;
     @FXML
     private Button alphaCutButton;
+    @FXML
+    private MenuItem undoMenuItem;
+    @FXML
+    private MenuItem redoMenuItem;
+    @FXML
+    private RadioButton cutAlphaRadioButton;
 
     public BorderPane getEditorWindow() {
         return editorWindow;
@@ -101,5 +104,17 @@ public class ControllerEditorWindow {
 
     public Label getAlphaToleranceValue() {
         return alphaToleranceValue;
+    }
+
+    public MenuItem getUndoMenuItem() {
+        return undoMenuItem;
+    }
+
+    public MenuItem getRedoMenuItem() {
+        return redoMenuItem;
+    }
+
+    public boolean isReplaceCutColorOptionOn(){
+        return !cutAlphaRadioButton.isSelected();
     }
 }

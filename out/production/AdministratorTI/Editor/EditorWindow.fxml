@@ -33,6 +33,8 @@
                 </Menu>
                 <Menu mnemonicParsing="false" text="Edycja">
                   <items>
+                        <MenuItem fx:id="undoMenuItem" disable="true" mnemonicParsing="false" text="Cofnij" />
+                        <MenuItem fx:id="redoMenuItem" disable="true" mnemonicParsing="false" text="Powtórz" />
                         <MenuItem mnemonicParsing="false" text="Zaznacz" />
                         <MenuItem mnemonicParsing="false" text="Zaznacz proporcjonalnie" />
                     <MenuItem mnemonicParsing="false" text="Zapisz" />
@@ -137,9 +139,22 @@
                      </VBox.margin>
                   </Slider>
                   <Label fx:id="alphaToleranceValue" text="0.10" textAlignment="CENTER" />
-                  <Button fx:id="alphaCutButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Wytnij kolor alpha">
+                  <RadioButton fx:id="cutAlphaRadioButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" selected="true" text="wytnij kolor">
+                     <toggleGroup>
+                        <ToggleGroup fx:id="alphaCut" />
+                     </toggleGroup>
                      <VBox.margin>
-                        <Insets top="45.0" />
+                        <Insets top="10.0" />
+                     </VBox.margin>
+                  </RadioButton>
+                  <RadioButton maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="zastąp kol. zaznacz." toggleGroup="$alphaCut">
+                     <VBox.margin>
+                        <Insets top="10.0" />
+                     </VBox.margin>
+                  </RadioButton>
+                  <Button fx:id="alphaCutButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Wytnij/ zastąp">
+                     <VBox.margin>
+                        <Insets top="20.0" />
                      </VBox.margin>
                   </Button>
                   <Button fx:id="saveImage" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Zapisz zmiany">

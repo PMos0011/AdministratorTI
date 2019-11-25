@@ -17,6 +17,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
 import javafx.scene.image.*;
 import javafx.scene.image.Image;
@@ -31,6 +32,8 @@ import javafx.stage.StageStyle;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Editor extends Application {
@@ -40,9 +43,11 @@ public class Editor extends Application {
     private final int X_MAX_DIMENSION = 705;
     private final int Y_MAX_DIMENSION = 500;
 
-    private ControllerEditorWindow controllerEditorWindow;
     private Main main;
+    private List<Image> imagesList = new ArrayList<>();
+    private int currentStep;
 
+    private ControllerEditorWindow controllerEditorWindow;
     private BorderPane editorWindow;
     private ImageView editedImage;
     private Canvas canvas;
@@ -50,14 +55,8 @@ public class Editor extends Application {
     private ColorPicker alphaColorPicker;
     private Slider opacitySlider;
     private Slider alphaToleranceSlider;
-    private Label opacityLabel;
-    private Label alphaToleranceLabel;
-    private Button cropImageButton;
-    private Button aspectCropImageButton;
-    private Button clearSelectionButton;
-    private Button saveImageButton;
-    private Button alphaColorCutButton;
-    private Image imageToEdit;
+    private MenuItem undoMenuItem;
+    private MenuItem redoMenuItem;
 
     private int xDifference;
     private int yDifference;
@@ -72,8 +71,9 @@ public class Editor extends Application {
     private GraphicsContext gc;
 
     public Editor(Image imageToEdit, Main main) {
-        this.imageToEdit = imageToEdit;
+        imagesList.add(imageToEdit);
         this.main = main;
+        currentStep = 0;
     }
 
     @Override
@@ -98,39 +98,43 @@ public class Editor extends Application {
 
         editorWindow = controllerEditorWindow.getEditorWindow();
         editedImage = controllerEditorWindow.getEditedImage();
-        editedImage.setImage(imageToEdit);
+        editedImage.setImage(imagesList.get(0));
         canvas = controllerEditorWindow.getCanvas();
         basicCanvasMouseEventHandlers();
 
         colorPicker = controllerEditorWindow.getColorPicker();
-        colorPicker.setOnAction(this::colorPick);
         colorPicker.setValue(Color.RED);
 
         alphaColorPicker = controllerEditorWindow.getAlphaColorPicker();
 
         opacitySlider = controllerEditorWindow.getOpacitySlider();
-        opacityLabel = controllerEditorWindow.getOpacityValue();
+        Label opacityLabel = controllerEditorWindow.getOpacityValue();
         opacityLabel.textProperty().bind(Bindings.format("%.2f", opacitySlider.valueProperty()));
 
         alphaToleranceSlider = controllerEditorWindow.getAlphaToleranceSlider();
-        alphaToleranceLabel = controllerEditorWindow.getAlphaToleranceValue();
+        Label alphaToleranceLabel = controllerEditorWindow.getAlphaToleranceValue();
         alphaToleranceLabel.textProperty().bind(Bindings.format("%.2f", alphaToleranceSlider.valueProperty()));
 
-        cropImageButton = controllerEditorWindow.getCropImage();
+        undoMenuItem = controllerEditorWindow.getUndoMenuItem();
+        undoMenuItem.setOnAction(this::undo);
+        redoMenuItem = controllerEditorWindow.getRedoMenuItem();
+        redoMenuItem.setOnAction(this::redo);
+
+        Button cropImageButton = controllerEditorWindow.getCropImage();
         cropImageButton.setOnAction(e -> {
             cropImage(false);
         });
-        aspectCropImageButton = controllerEditorWindow.getCropAspectImage();
+        Button aspectCropImageButton = controllerEditorWindow.getCropAspectImage();
         aspectCropImageButton.setOnAction(e -> {
             cropImage(true);
         });
-        clearSelectionButton = controllerEditorWindow.getClearSelection();
+        Button clearSelectionButton = controllerEditorWindow.getClearSelection();
         clearSelectionButton.setOnAction(this::clearSelection);
 
-        saveImageButton = controllerEditorWindow.getSaveImage();
+        Button saveImageButton = controllerEditorWindow.getSaveImage();
         saveImageButton.setOnAction(this::saveImage);
 
-        alphaColorCutButton = controllerEditorWindow.getAlphaCutButton();
+        Button alphaColorCutButton = controllerEditorWindow.getAlphaCutButton();
         alphaColorCutButton.setOnAction(this::cutAlphaColor);
 
         aspectSize = new Point(1, 1);
@@ -145,10 +149,6 @@ public class Editor extends Application {
 
     public static void main(String[] args) {
         launch(args);
-    }
-
-    private void colorPick(ActionEvent e) {
-        System.out.println(colorPicker.getValue());
     }
 
     private void canvasMousePressed(MouseEvent e) {
@@ -330,6 +330,7 @@ public class Editor extends Application {
         editedImage.snapshot(parameters, image);
         BufferedImage bufferedImage = SwingFXUtils.fromFXImage(image, null);
         image = SwingFXUtils.toFXImage(loader.resizeImage(bufferedImage), null);
+        addImageToList(image);
         editedImage.setImage(image);
 
         clearSelection(null);
@@ -400,20 +401,32 @@ public class Editor extends Application {
             rightBorder = (int) (leftBorder + imageSize.x * imageSizeCorrectionX);
             bottomBorder = (int) (topBorder + imageSize.y * imageSizeCorrectionY);
 
+            clearSelection(null);
         }
 
         double tolerance = alphaToleranceSlider.getValue();
         Color alphaColor = alphaColorPicker.getValue();
+        int argb;
+
+        if (controllerEditorWindow.isReplaceCutColorOptionOn())
+            argb = convertToArgb(opacitySlider.getValue(),
+                    colorPicker.getValue().getRed(),
+                    colorPicker.getValue().getGreen(),
+                    colorPicker.getValue().getBlue());
+        else
+            argb = convertToArgb(1, 1, 1, 1);
+
         for (int w = 0; w < width; w++)
             for (int h = 0; h < height; h++) {
                 Color currentPixelColor = pixelReader.getColor(w, h);
                 if (colorTolerance(currentPixelColor, alphaColor, tolerance)
                         && (w > leftBorder && w < rightBorder)
                         && (h > topBorder && h < bottomBorder))
-                    pixelWriter.setColor(w, h, Color.WHITE);
+                    pixelWriter.setArgb(w, h, argb);
                 else
                     pixelWriter.setColor(w, h, currentPixelColor);
             }
+        addImageToList(writableImage);
         editedImage.setImage(writableImage);
     }
 
@@ -426,4 +439,55 @@ public class Editor extends Application {
     private boolean colorTolerance(double a, double b, double tolerance) {
         return Math.abs(a - b) < tolerance;
     }
+
+    private void addImageToList(Image image) {
+        currentStep++;
+
+        if (currentStep == 1)
+            undoMenuItem.setDisable(false);
+
+        while (imagesList.size() > currentStep) {
+            imagesList.remove(imagesList.size() - 1);
+
+        }
+
+        redoMenuItem.setDisable(true);
+        imagesList.add(image);
+    }
+
+    private void redo(ActionEvent actionEvent) {
+        currentStep++;
+        editedImage.setImage(imagesList.get(currentStep));
+
+        if (currentStep == imagesList.size() - 1)
+            redoMenuItem.setDisable(true);
+
+        if (currentStep > 0)
+            undoMenuItem.setDisable(false);
+    }
+
+    private void undo(ActionEvent actionEvent) {
+        currentStep--;
+        editedImage.setImage(imagesList.get(currentStep));
+
+        if (currentStep < imagesList.size())
+            redoMenuItem.setDisable(false);
+
+        if (currentStep == 0)
+            undoMenuItem.setDisable(true);
+    }
+
+    private int convertToArgb(double A, double R, double G, double B) {
+
+        byte[] colorByteArr = {(byte) (int) (A * 255),
+                (byte) (int) (R * 255),
+                (byte) (int) (G * 255),
+                (byte) (int) (B * 255)};
+
+        return (colorByteArr[0] << 24) +
+                ((colorByteArr[1] & 0xFF) << 16) +
+                ((colorByteArr[2] & 0xFF) << 8) +
+                (colorByteArr[3] & 0xFF);
+    }
+
 }

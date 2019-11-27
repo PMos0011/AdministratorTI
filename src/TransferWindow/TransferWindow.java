@@ -1,5 +1,6 @@
 package TransferWindow;
 
+import Common.Logs;
 import MainWindow.Main;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
@@ -36,11 +37,13 @@ public class TransferWindow extends Application {
 
     private List<Group> groups = new ArrayList<>();
     private List<Save> saves = new ArrayList<>();
+    private String serverAddress;
     private boolean importAction;
 
-    public TransferWindow(boolean importAction, Main main) {
+    public TransferWindow(boolean importAction, Main main, String serverAddress) {
         this.importAction = importAction;
         this.main = main;
+        this.serverAddress = serverAddress;
     }
 
     @Override
@@ -78,14 +81,14 @@ public class TransferWindow extends Application {
 
         StringBuilder response = new StringBuilder();
         try {
-            URL url = new URL("http://192.70.100.100/TI/PHP/getGRP.php");
+            URL url = new URL("http://" + serverAddress + "/TI/PHP/getGRP.php");
             BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
             String temp;
             while ((temp = in.readLine()) != null)
                 response.append(temp);
             in.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            Logs.saveLog(e.toString(), "Transfer_window");
         }
         return response.toString();
     }
@@ -96,7 +99,7 @@ public class TransferWindow extends Application {
         StringBuilder response = new StringBuilder();
 
         try {
-            URL url = new URL("http://192.70.100.100/TI/PHP/getSaves.php");
+            URL url = new URL("http://" + serverAddress + "/TI/PHP/getSaves.php");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
 
@@ -114,7 +117,7 @@ public class TransferWindow extends Application {
             connection.disconnect();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            Logs.saveLog(e.toString(), "File_transfer");
         }
         return response.toString();
     }

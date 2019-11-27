@@ -1,6 +1,7 @@
 package TransferWindow;
 
 import Common.FileHandler;
+import Common.Logs;
 import MainWindow.Main;
 import Slide.Slide;
 import javafx.application.Application;
@@ -118,11 +119,11 @@ class FileTransferHandler extends Task {
 
     private void setTCPConnection() {
         try {
-            clientSocket = new Socket("192.70.100.100", 55000);
+            clientSocket = new Socket(fileHandler.getServerIPAddress(), 55000);
             outputStream = new DataOutputStream(clientSocket.getOutputStream());
             inputStream = new DataInputStream(clientSocket.getInputStream());
         } catch (IOException e) {
-            e.printStackTrace();
+            Logs.saveLog(e.toString(), "File_transfer");
         }
     }
 
@@ -152,7 +153,7 @@ class FileTransferHandler extends Task {
             fileOutputStream.close();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            Logs.saveLog(e.toString(), "File_transfer");
         }
     }
 
@@ -186,7 +187,7 @@ class FileTransferHandler extends Task {
             fileInputStream.close();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            Logs.saveLog(e.toString(), "File_transfer");
         }
     }
 
@@ -196,7 +197,7 @@ class FileTransferHandler extends Task {
             outputStream.close();
             clientSocket.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            Logs.saveLog(e.toString(), "File_transfer");
         }
     }
 

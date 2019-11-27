@@ -75,7 +75,7 @@ public class JSONHandler {
                 return JSONobject.getSlides(main, fileHandler, loader);
 
             } catch (IOException e) {
-                e.printStackTrace();
+                Logs.saveLog(e.toString(), "JSONHandler");
             }
         }
         return null;
@@ -89,7 +89,7 @@ public class JSONHandler {
             writer.write(json);
             writer.close();
         } catch (IOException e) {
-            Logs.saveLog(e.toString(), "fileHandler");
+            Logs.saveLog(e.toString(), "JSONHandler");
         }
     }
 }

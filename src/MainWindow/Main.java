@@ -1,5 +1,6 @@
 package MainWindow;
 
+import AppPropertiesWindow.AppPropertiesWindow;
 import CategoryPicker.CategoryPicker;
 import Common.*;
 import Editor.Editor;
@@ -33,24 +34,23 @@ public class Main extends Application {
     private static final String DEFAULT_CATEGORY_ICON = CATEGORY_PATH + "dok.png";
 
     private Stage primaryStage;
-    private Loader loader = new Loader();
-    private FileHandler fileHandler = new FileHandler();
-    private CategoryPicker picker = new CategoryPicker(loader, this);
+    private Loader loader;
+    private FileHandler fileHandler;
+    private CategoryPicker picker;
     private ControllerMainWindow controllerMainWindow;
     private Slide initSlide;
     private ListView slideList;
     private TextField headerField;
     private TextField firsField;
     private TextField secondField;
-    private Slide currentSlide = new Slide();
-    private List<Slide> slides = new ArrayList<Slide>();
-    private ObservableList<String> listFileNames = FXCollections.observableArrayList();
+    private Slide currentSlide;
+    private List<Slide> slides;
+    private ObservableList<String> listFileNames;
     private List<String> slideHeaders = new ArrayList<>();
 
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        initSlide = loader.loadInitialSlide();
 
         this.primaryStage = primaryStage;
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("MainWindow.fxml"));
@@ -61,6 +61,15 @@ public class Main extends Application {
         primaryStage.setScene(new Scene(root, 1050, 720));
         primaryStage.show();
 
+        loader = new Loader();
+        picker = new CategoryPicker(loader, this);
+        fileHandler = new FileHandler();
+
+        currentSlide = new Slide();
+        slides = new ArrayList<Slide>();
+        listFileNames = FXCollections.observableArrayList();
+
+        initSlide = loader.loadInitialSlide();
         viewUpdate(initSlide);
 
         ImageView mainImage = controllerMainWindow.getMainImage();
@@ -94,6 +103,8 @@ public class Main extends Application {
         importActionMenuItem.setOnAction(this::onImportAction);
         MenuItem exportActionMenuItem = controllerMainWindow.getExportMenuItem();
         exportActionMenuItem.setOnAction(this::onExportAction);
+        MenuItem settingsActionMenuItem = controllerMainWindow.getSettingsMenuItem();
+        settingsActionMenuItem.setOnAction(this::onSettingsAction);
     }
 
     public static void main(String[] args) {
@@ -327,7 +338,7 @@ public class Main extends Application {
     }
 
     private void onImportAction(ActionEvent event) {
-        TransferWindow transferWindow = new TransferWindow(true, this);
+        TransferWindow transferWindow = new TransferWindow(true, this, fileHandler.getServerIPAddress());
         try {
             transferWindow.start(TransferWindow.transferStage);
         } catch (Exception e) {
@@ -336,11 +347,16 @@ public class Main extends Application {
     }
 
     private void onExportAction(ActionEvent event) {
-        TransferWindow transferWindow = new TransferWindow(false, this);
+        TransferWindow transferWindow = new TransferWindow(false, this, fileHandler.getServerIPAddress());
         try {
             transferWindow.start(TransferWindow.transferStage);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void onSettingsAction(ActionEvent actionEvent) {
+        AppPropertiesWindow appPropertiesWindow = new AppPropertiesWindow(fileHandler, fileHandler.getServerIPAddress());
+        appPropertiesWindow.start(AppPropertiesWindow.appPropertiesStage);
     }
 }

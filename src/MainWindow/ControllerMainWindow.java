@@ -41,6 +41,8 @@ public class ControllerMainWindow {
     private MenuItem importMenuItem;
     @FXML
     private MenuItem exportMenuItem;
+    @FXML
+    private MenuItem settingsMenuItem;
 
     public BorderPane getBorderPane() {
         return borderPane;
@@ -112,6 +114,10 @@ public class ControllerMainWindow {
 
     public MenuItem getExportMenuItem() {
         return exportMenuItem;
+    }
+
+    public MenuItem getSettingsMenuItem() {
+        return settingsMenuItem;
     }
 
     public void addSlideToList(List<String> list, int selectedItem) {

@@ -1,5 +1,6 @@
 package Common;
 
+import AppPropertiesWindow.AppPropertiesWindow;
 import Slide.Slide;
 import javafx.embed.swing.SwingFXUtils;
 
@@ -8,6 +9,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -15,16 +17,22 @@ import java.util.zip.ZipOutputStream;
 
 public class FileHandler {
 
-    private final String tempDirectory;
-    private final String saveDirectory;
-    private final String transferDirectory;
+    private String tempDirectory;
+    private String saveDirectory;
+    private String transferDirectory;
+    private String TIDirectory;
+    private String appPropertiesFileName;
 
     public FileHandler() {
+        TIDirectory = System.getProperty("user.home") + "/TI";
         tempDirectory = System.getProperty("user.home") + "/TI/temp";
         saveDirectory = System.getProperty("user.home") + "/TI/save";
         transferDirectory = System.getProperty("user.home") + "/TI/transfer";
+        appPropertiesFileName = "appProperties.properties";
         createDirectory();
+        createAppProperties();
         clearDirectory(getFileTempDirectory());
+
     }
 
     public String getTempDirectory() {
@@ -36,7 +44,7 @@ public class FileHandler {
     }
 
     public String getTransferDirectory() {
-        return transferDirectory+ File.separator;
+        return transferDirectory + File.separator;
     }
 
     public File getFileSaveDirectory() {
@@ -141,7 +149,33 @@ public class FileHandler {
         File[] files = directory.listFiles();
         assert files != null;
         for (File file : files) {
-          file.delete();
+            file.delete();
+        }
+    }
+
+    private void createAppProperties() {
+        File file = new File(TIDirectory + File.separator + appPropertiesFileName);
+        if (!file.exists()) {
+            AppPropertiesWindow appPropertiesWindow = new AppPropertiesWindow(this,null);
+            appPropertiesWindow.start(AppPropertiesWindow.appPropertiesStage);
+        }
+    }
+
+    public String getServerIPAddress() {
+        Properties properties = new Properties();
+        try {
+            properties.load(new FileInputStream(TIDirectory + File.separator + appPropertiesFileName));
+        } catch (IOException e) {
+            Logs.saveLog(e.toString(), "fileHandler");
+        }
+        return properties.getProperty(AppPropertiesWindow.SERVER_ADDRESS_PROPERTY_NAME);
+    }
+
+    public void saveAppPropertiesFile(Properties properties) {
+        try {
+            properties.store(new FileWriter(TIDirectory + File.separator + appPropertiesFileName), null);
+        } catch (IOException e) {
+            Logs.saveLog(e.toString(), "fileHandler");
         }
     }
 }

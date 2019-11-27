@@ -28,6 +28,7 @@
                                 <MenuItem fx:id="saveMenuItem" mnemonicParsing="false" text="Zapisz"/>
                                 <MenuItem fx:id="exportMenuItem" mnemonicParsing="false" text="Publikuj"/>
                                 <MenuItem fx:id="importMenuItem" mnemonicParsing="false" text="Importuj"/>
+                                <MenuItem fx:id="settingsMenuItem" mnemonicParsing="false" text="Ustawienia"/>
                                 <MenuItem mnemonicParsing="false" text="Zamknij"/>
                             </items>
                         </Menu>

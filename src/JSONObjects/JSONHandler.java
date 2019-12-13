@@ -47,10 +47,12 @@ public class JSONHandler {
         }
 
         Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-        String JSONString = gson.toJson(JSONobject);
 
-        JSONSave(fileHandler, JSONString, name);
-
+        try (Writer writer = new OutputStreamWriter(new FileOutputStream(fileHandler.getFileTempDirectory() + File.separator + name + ".json"),"UTF-8")) {
+            gson.toJson(JSONobject,writer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static List<Slide> readJSONFile(Main main, FileHandler fileHandler, Loader loader) {
@@ -62,7 +64,8 @@ public class JSONHandler {
 
         if (jsonFile.length == 1) {
             try {
-                BufferedReader reader = new BufferedReader(new FileReader(jsonFile[0]));
+                BufferedReader reader = new BufferedReader(new InputStreamReader(
+                        new FileInputStream(jsonFile[0].getAbsolutePath()), "UTF8"));
                 StringBuilder jsonObject = new StringBuilder();
                 String tempLine;
                 while ((tempLine = reader.readLine()) != null)
@@ -79,17 +82,5 @@ public class JSONHandler {
             }
         }
         return null;
-    }
-
-    private static void JSONSave(FileHandler fileHandler, String json, String name) {
-
-        File fileName = new File(fileHandler.getFileTempDirectory(), name + ".json");
-        try {
-            FileWriter writer = new FileWriter(fileName);
-            writer.write(json);
-            writer.close();
-        } catch (IOException e) {
-            Logs.saveLog(e.toString(), "JSONHandler");
-        }
     }
 }

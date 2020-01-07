@@ -50,11 +50,11 @@ public class CategoryPicker extends Application {
         Pane root = new Pane();
         int xPos;
         int yPos = 10;
+        int categoryID=0;
 
         for (int i = 0; i < 3; i++) {
             xPos = 10;
             for (int j = 0; j < 6; j++) {
-                int categoryID = i * 3 + j;
                 images[i][j] = new ImageView();
                 images[i][j].setCursor(Cursor.HAND);
                 images[i][j].setFitHeight(55);
@@ -69,6 +69,7 @@ public class CategoryPicker extends Application {
                 images[i][j].addEventHandler(MouseEvent.MOUSE_CLICKED, new sendCategoryPath());
                 Tooltip.install(images[i][j], tooltips[i][j]);
                 xPos += 60;
+                categoryID++;
                 root.getChildren().add(images[i][j]);
             }
             yPos += 60;

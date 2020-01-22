@@ -23,6 +23,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.apache.http.impl.client.BasicCookieStore;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -32,6 +33,8 @@ public class Main extends Application {
 
     public static final String CATEGORY_PATH = "src/images/";
     private static final String DEFAULT_CATEGORY_ICON = CATEGORY_PATH + "dok.png";
+
+    private BasicCookieStore sessionCookieStore;
 
     private Stage primaryStage;
     private Loader loader;
@@ -51,6 +54,8 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+
+        sessionCookieStore = new BasicCookieStore();
 
         this.primaryStage = primaryStage;
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("MainWindow.fxml"));
@@ -224,9 +229,9 @@ public class Main extends Application {
 
     private void listClicked(MouseEvent e) {
         int slideID = slideList.getSelectionModel().getSelectedIndex();
-        String test2 = listFileNames.get(slideID);
-        for (Slide slide : slides) {
-            if (slide.getFileName().equals(test2)) {
+        String slides = listFileNames.get(slideID);
+        for (Slide slide : this.slides) {
+            if (slide.getFileName().equals(slides)) {
                 currentSlide = slide;
                 viewUpdate(currentSlide);
                 break;
@@ -338,7 +343,7 @@ public class Main extends Application {
     }
 
     private void onImportAction(ActionEvent event) {
-        TransferWindow transferWindow = new TransferWindow(true, this, fileHandler.getServerIPAddress());
+        TransferWindow transferWindow = new TransferWindow(true, this, fileHandler.getServerIPAddress(), sessionCookieStore);
         try {
             transferWindow.start(TransferWindow.transferStage);
         } catch (Exception e) {
@@ -347,7 +352,7 @@ public class Main extends Application {
     }
 
     private void onExportAction(ActionEvent event) {
-        TransferWindow transferWindow = new TransferWindow(false, this, fileHandler.getServerIPAddress());
+        TransferWindow transferWindow = new TransferWindow(false, this, fileHandler.getServerIPAddress(), sessionCookieStore);
         try {
             transferWindow.start(TransferWindow.transferStage);
         } catch (Exception e) {

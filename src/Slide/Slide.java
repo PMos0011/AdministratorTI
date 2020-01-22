@@ -2,6 +2,8 @@ package Slide;
 
 import javafx.scene.image.Image;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Random;
 
 public class Slide {
@@ -93,5 +95,12 @@ public class Slide {
             name.append(asciCode);
         }
         return name.toString();
+    }
+
+    public static String generateName(String fileName){
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        String date = dateFormat.format(new Date());
+
+        return fileName+"."+date+"."+ Slide.generateName(4);
     }
 }

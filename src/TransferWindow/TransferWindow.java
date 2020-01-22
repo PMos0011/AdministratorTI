@@ -2,6 +2,7 @@ package TransferWindow;
 
 import Common.Logs;
 import MainWindow.Main;
+import Slide.Slide;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
@@ -15,14 +16,10 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.apache.http.impl.client.BasicCookieStore;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.reflect.Type;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +28,7 @@ public class TransferWindow extends Application {
 
     public static Stage transferStage = new Stage();
     private Main main;
+    private BasicCookieStore cookieStore;
 
     private ListView listView = new ListView();
     private Button button = new Button();
@@ -40,86 +38,58 @@ public class TransferWindow extends Application {
     private String serverAddress;
     private boolean importAction;
 
-    public TransferWindow(boolean importAction, Main main, String serverAddress) {
+    public TransferWindow(boolean importAction, Main main, String serverAddress, BasicCookieStore cookieStore) {
         this.importAction = importAction;
         this.main = main;
         this.serverAddress = serverAddress;
+        this.cookieStore = cookieStore;
     }
 
     @Override
     public void start(Stage stage) {
-        transferStage = stage;
-        Pane root = new Pane();
-
-        listView.setMaxWidth(200);
-        listView.setMaxHeight(180);
-        listView.setLayoutX(5);
-        listView.setLayoutY(5);
-
-        button.setOnAction(this::buttonOnBasicAction);
-        button.setText("OK");
-        button.setMinWidth(100);
-        button.setLayoutX(225);
-        button.setLayoutY(160);
-
-        String response = getUrlResponse();
-        groupListWrite(response);
-
-        root.getChildren().add(listView);
-        root.getChildren().add(button);
-
-        transferStage.setTitle("Import/Eksport");
-        transferStage.setScene(new Scene(root, 355, 195));
-        if (transferStage.getModality() != Modality.APPLICATION_MODAL) {
-            transferStage.initModality(Modality.APPLICATION_MODAL);
-            transferStage.initStyle(StageStyle.UTILITY);
-        }
-        transferStage.show();
-    }
-
-    private String getUrlResponse() {
-
-        StringBuilder response = new StringBuilder();
-        try {
-            URL url = new URL("http://" + serverAddress + "/TI/PHP/getGRP.php");
-            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
-            String temp;
-            while ((temp = in.readLine()) != null)
-                response.append(temp);
-            in.close();
-        } catch (IOException e) {
-            Logs.saveLog(e.toString(), "Transfer_window");
-        }
-        return response.toString();
-    }
-
-    private String getUrlResponse(String groupID) {
-
-        String request = "GRP=" + groupID;
-        StringBuilder response = new StringBuilder();
 
         try {
-            URL url = new URL("http://" + serverAddress + "/TI/PHP/getSaves.php");
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST");
+            if (!PHPConnections.checkPHPSessionIfValidReturnTrue(cookieStore, serverAddress)) {
 
-            connection.setDoOutput(true);
-            DataOutputStream out = new DataOutputStream(connection.getOutputStream());
-            out.writeBytes(request);
+                LoginWindow transferWindow = new LoginWindow(this, serverAddress, cookieStore);
+                try {
+                    transferWindow.start(LoginWindow.loginWindow);
+                } catch (Exception e) {
+                    Logs.saveLog(e.toString(),"TransferWindow");
+                    new Alert(Alert.AlertType.INFORMATION, "Błąd tworzenia okna").showAndWait();
+                }
+            } else {
+                transferStage = stage;
+                Pane root = new Pane();
 
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String temp;
-            while ((temp = in.readLine()) != null)
-                response.append(temp);
-            out.flush();
-            out.close();
-            in.close();
-            connection.disconnect();
+                listView.setMaxWidth(200);
+                listView.setMaxHeight(180);
+                listView.setLayoutX(5);
+                listView.setLayoutY(5);
 
+                button.setOnAction(this::buttonOnBasicAction);
+                button.setText("OK");
+                button.setMinWidth(100);
+                button.setLayoutX(225);
+                button.setLayoutY(160);
+
+                groupListWrite(PHPConnections.returnStringFromHttpResponse(cookieStore,serverAddress,null));
+
+                root.getChildren().add(listView);
+                root.getChildren().add(button);
+
+                transferStage.setTitle("Import/Eksport");
+                transferStage.setScene(new Scene(root, 355, 195));
+                if (transferStage.getModality() != Modality.APPLICATION_MODAL) {
+                    transferStage.initModality(Modality.APPLICATION_MODAL);
+                    transferStage.initStyle(StageStyle.UTILITY);
+                }
+                transferStage.show();
+            }
         } catch (IOException e) {
-            Logs.saveLog(e.toString(), "File_transfer");
+            Logs.saveLog(e.toString(),"TransferWindow");
+            new Alert(Alert.AlertType.INFORMATION, "Błąd http").showAndWait();
         }
-        return response.toString();
     }
 
     private void groupListWrite(String response) {
@@ -152,11 +122,17 @@ public class TransferWindow extends Application {
         if (selectedItem >= 0) {
             if (importAction) {
                 button.setOnAction(this::buttonOnImportAction);
-                String response = getUrlResponse(groups.get(selectedItem).getParam());
-                savesListWrite(response);
+                try {
+                    savesListWrite(PHPConnections.returnStringFromHttpResponse(cookieStore,serverAddress,groups.get(selectedItem).getParam()));
+                } catch (IOException ex) {
+                    Logs.saveLog(ex.toString(),"TransferWindow");
+                    new Alert(Alert.AlertType.INFORMATION, "Błąd pobierania listy grup").showAndWait();
+                }
             } else {
+                //String fileName = Slide.generateName(groups.get(selectedItem).getParam());
                 FileTransfer fileTransfer = new FileTransfer(false, groups.get(selectedItem).getParam(), main);
                 fileTransfer.start(FileTransfer.fileTransferStage);
+                //PHPConnections.addPublicationLogs(cookieStore,serverAddress);
                 transferStage.close();
             }
 

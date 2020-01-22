@@ -1,6 +1,5 @@
 package TransferWindow;
 
-import MainWindow.Main;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.scene.Scene;
@@ -8,6 +7,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
@@ -41,6 +42,7 @@ public class LoginWindow extends Application {
 
         loginWindow = stage;
         Pane root = new Pane();
+        root.setOnKeyPressed(this::KeyPressedListener);
 
         loginText = new Text();
         loginText.setText("Login");
@@ -87,6 +89,13 @@ public class LoginWindow extends Application {
         }
         loginWindow.show();
 
+    }
+
+    private void KeyPressedListener(KeyEvent keyEvent) {
+        if (keyEvent.getCode() == KeyCode.ENTER)
+            authorizeUser(null);
+        if(keyEvent.getCode() == KeyCode.ESCAPE)
+            loginWindow.close();
     }
 
     private void closeWindow(ActionEvent actionEvent) {

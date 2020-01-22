@@ -100,21 +100,21 @@ class PHPConnections {
        return returnStringFromHttpResponse(rd);
     }
 
-    static void addPublicationLogs(BasicCookieStore cookieStore, String serverAddress, String groupId){
+    static void addPublicationLogs(BasicCookieStore cookieStore, String serverAddress, String groupId, String fileName){
 
         HttpClient client = HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategy()).setDefaultCookieStore(cookieStore).build();
         HttpPost request = new HttpPost("http://" + serverAddress + "/TI/APP_PHP/logs.php");
 
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("GRP", groupId));
+        params.add(new BasicNameValuePair("fileName", fileName));
         try {
             request.setEntity(new UrlEncodedFormEntity(params));
             client.execute(request);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
 
     }
 }

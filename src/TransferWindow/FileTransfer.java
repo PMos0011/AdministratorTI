@@ -100,6 +100,7 @@ class FileTransferHandler extends Task {
         this.main = main;
 
         fileHandler = new FileHandler();
+
     }
 
     @Override
@@ -162,14 +163,13 @@ class FileTransferHandler extends Task {
         fileHandler.clearDirectory(fileHandler.getFileTransferDirectory());
         fileHandler.clearDirectory(fileHandler.getFileTempDirectory());
 
-        String name = generateName();
-        File file = new File(fileHandler.getTransferDirectory(),name);
+        File file = new File(fileHandler.getTransferDirectory(),fileName);
 
-        main.zipFileFromTempToDirectory(file,name,Integer.parseInt(fileName));
+        main.zipFileFromTempToDirectory(file,fileName,returnGroupIDFromFileName(fileName));
         long fileSize = file.length();
         long counter = 0;
 
-        String packageName = "1@"+fileSize+"@"+name;
+        String packageName = "1@"+fileSize+"@"+fileName;
         byte[] dataBuffer = packageName.getBytes(StandardCharsets.UTF_8);
 
         try {
@@ -201,11 +201,9 @@ class FileTransferHandler extends Task {
         }
     }
 
-    private String generateName(){
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-        String date = dateFormat.format(new Date());
-
-        return fileName+"."+date+"."+ Slide.generateName(4);
+    private int returnGroupIDFromFileName(String fileName){
+        String[] splitedFileName = fileName.split("\\.");
+        return Integer.parseInt(splitedFileName[0]);
     }
 
     private Runnable closeStage = new Runnable() {

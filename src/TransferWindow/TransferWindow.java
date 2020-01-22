@@ -129,10 +129,10 @@ public class TransferWindow extends Application {
                     new Alert(Alert.AlertType.INFORMATION, "Błąd pobierania listy grup").showAndWait();
                 }
             } else {
-                //String fileName = Slide.generateName(groups.get(selectedItem).getParam());
-                FileTransfer fileTransfer = new FileTransfer(false, groups.get(selectedItem).getParam(), main);
+                String fileName = Slide.generateName(groups.get(selectedItem).getParam());
+                FileTransfer fileTransfer = new FileTransfer(false, fileName, main);
                 fileTransfer.start(FileTransfer.fileTransferStage);
-                //PHPConnections.addPublicationLogs(cookieStore,serverAddress);
+                PHPConnections.addPublicationLogs(cookieStore,serverAddress,groups.get(selectedItem).getParam(),fileName);
                 transferStage.close();
             }
 

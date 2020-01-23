@@ -1,6 +1,6 @@
 package Common;
 
-import AppPropertiesWindow.AppPropertiesWindow;
+import AppPropertiesWindow.AppProperties;
 import Slide.Slide;
 import javafx.embed.swing.SwingFXUtils;
 
@@ -156,8 +156,8 @@ public class FileHandler {
     private void createAppProperties() {
         File file = new File(TIDirectory + File.separator + appPropertiesFileName);
         if (!file.exists()) {
-            AppPropertiesWindow appPropertiesWindow = new AppPropertiesWindow(this,null);
-            appPropertiesWindow.start(AppPropertiesWindow.appPropertiesStage);
+            AppProperties appProperties = new AppProperties(this,null);
+            appProperties.start(AppProperties.appPropertiesStage);
         }
     }
 
@@ -168,7 +168,7 @@ public class FileHandler {
         } catch (IOException e) {
             Logs.saveLog(e.toString(), "fileHandler");
         }
-        return properties.getProperty(AppPropertiesWindow.SERVER_ADDRESS_PROPERTY_NAME);
+        return properties.getProperty(AppProperties.SERVER_ADDRESS_PROPERTY_NAME);
     }
 
     public void saveAppPropertiesFile(Properties properties) {

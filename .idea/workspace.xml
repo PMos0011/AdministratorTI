@@ -114,14 +114,17 @@
     <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
-      <recent name="Common" />
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\pawel\IdeaProjects\AdministratorTI\src\AppPropertiesWindow" />
     </key>
-    <key name="CreateClassDialog.RecentsKey">
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="Common" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\pawel\IdeaProjects\AdministratorTI\src\images" />
+    </key>
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="Common" />
     </key>
   </component>
   <component name="RunDashboard">

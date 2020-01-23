@@ -1,6 +1,6 @@
 package MainWindow;
 
-import AppPropertiesWindow.AppPropertiesWindow;
+import AppPropertiesWindow.AppProperties;
 import CategoryPicker.CategoryPicker;
 import Common.*;
 import Editor.Editor;
@@ -361,7 +361,7 @@ public class Main extends Application {
     }
 
     private void onSettingsAction(ActionEvent actionEvent) {
-        AppPropertiesWindow appPropertiesWindow = new AppPropertiesWindow(fileHandler, fileHandler.getServerIPAddress());
-        appPropertiesWindow.start(AppPropertiesWindow.appPropertiesStage);
+        AppProperties appProperties = new AppProperties(fileHandler, fileHandler.getServerIPAddress());
+        appProperties.start(AppProperties.appPropertiesStage);
     }
 }

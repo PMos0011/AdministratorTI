@@ -2,17 +2,20 @@ package AppPropertiesWindow;
 
 import Common.FileHandler;
 import Common.Logs;
+import TransferWindow.PHPConnections;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.apache.http.impl.client.BasicCookieStore;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -27,6 +30,7 @@ public class AppProperties extends Application {
     public static Stage appPropertiesStage = new Stage();
     private FileHandler fileHandler;
     private String serverAddress;
+    BasicCookieStore cookieStore;
 
     private TextField serverAddressTextField;
     private TextField userNameTextField;
@@ -34,9 +38,10 @@ public class AppProperties extends Application {
     private PasswordField newPasswordPasswordField;
     private PasswordField confirmPasswordPasswordField;
 
-    public AppProperties(FileHandler fileHandler, String serverAddress) {
+    public AppProperties(FileHandler fileHandler, String serverAddress, BasicCookieStore cookieStore) {
         this.fileHandler = fileHandler;
         this.serverAddress = serverAddress;
+        this.cookieStore = cookieStore;
     }
 
     @Override
@@ -49,7 +54,7 @@ public class AppProperties extends Application {
         try {
             root = fxmlLoader.load();
         } catch (IOException e) {
-            Logs.saveLog(e.toString(),"AppProperties");
+            Logs.saveLog(e.toString(), "AppProperties");
         }
 
         ControllerAppPropertiesWindow controllerAppPropertiesWindow = fxmlLoader.getController();
@@ -91,12 +96,19 @@ public class AppProperties extends Application {
     }
 
     private void changePassword(ActionEvent actionEvent) {
+
+        if (newPasswordPasswordField.getText().equals(confirmPasswordPasswordField.getText())) {
+            if (PHPConnections.changeUserPassword(cookieStore, serverAddress,
+                    userNameTextField.getText(), userPasswordPasswordField.getText(), newPasswordPasswordField.getText()))
+                new Alert(Alert.AlertType.INFORMATION, "Hasło zostało zmienione").showAndWait();
+        } else
+            new Alert(Alert.AlertType.INFORMATION, "Hasło w polach nowe i potwierdź nie jest jednakowe").showAndWait();
     }
 
     private void saveProperties(ActionEvent actionEvent) {
         Properties properties = new Properties();
         properties.setProperty(SERVER_ADDRESS_PROPERTY_NAME, serverAddressTextField.getText());
         fileHandler.saveAppPropertiesFile(properties);
-        appPropertiesStage.close();
+        new Alert(Alert.AlertType.INFORMATION, "Adres został zmieniony").showAndWait();
     }
 }

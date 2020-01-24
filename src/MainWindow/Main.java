@@ -7,6 +7,7 @@ import Editor.Editor;
 import JSONObjects.JSONHandler;
 import Slide.Slide;
 import TransferWindow.TransferWindow;
+import TransferWindow.PHPConnections;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -23,6 +24,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import org.apache.http.impl.client.BasicCookieStore;
 
 import java.io.File;
@@ -64,7 +66,7 @@ public class Main extends Application {
 
         primaryStage.setTitle("Administrator treści Tablica Informacyjna");
         primaryStage.setScene(new Scene(root, 1050, 720));
-        primaryStage.show();
+        primaryStage.setOnCloseRequest(this::PHPLogout);
 
         loader = new Loader();
         picker = new CategoryPicker(loader, this);
@@ -110,6 +112,13 @@ public class Main extends Application {
         exportActionMenuItem.setOnAction(this::onExportAction);
         MenuItem settingsActionMenuItem = controllerMainWindow.getSettingsMenuItem();
         settingsActionMenuItem.setOnAction(this::onSettingsAction);
+
+        primaryStage.show();
+    }
+
+    private void PHPLogout(WindowEvent windowEvent) {
+        if (sessionCookieStore.getCookies().size() > 0)
+            PHPConnections.logoutPHPSession(sessionCookieStore, fileHandler.getServerIPAddress());
     }
 
     public static void main(String[] args) {
@@ -361,7 +370,7 @@ public class Main extends Application {
     }
 
     private void onSettingsAction(ActionEvent actionEvent) {
-        AppProperties appProperties = new AppProperties(fileHandler, fileHandler.getServerIPAddress());
+        AppProperties appProperties = new AppProperties(fileHandler, fileHandler.getServerIPAddress(), sessionCookieStore);
         appProperties.start(AppProperties.appPropertiesStage);
     }
 }

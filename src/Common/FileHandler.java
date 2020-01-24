@@ -3,6 +3,7 @@ package Common;
 import AppPropertiesWindow.AppProperties;
 import Slide.Slide;
 import javafx.embed.swing.SwingFXUtils;
+import org.apache.http.impl.client.BasicCookieStore;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -156,7 +157,7 @@ public class FileHandler {
     private void createAppProperties() {
         File file = new File(TIDirectory + File.separator + appPropertiesFileName);
         if (!file.exists()) {
-            AppProperties appProperties = new AppProperties(this,null);
+            AppProperties appProperties = new AppProperties(this,null, new BasicCookieStore());
             appProperties.start(AppProperties.appPropertiesStage);
         }
     }
